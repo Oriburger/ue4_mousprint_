@@ -19,6 +19,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 		UChildActorComponent * Weapon;
 
+	//UPROPERTY(VisibleAnywhere, Category = Camera)
+	UPROPERTY(BlueprintReadWrite, Category = Camera)
+		USpringArmComponent* CameraBoomNormal;
+
+	//UPROPERTY(VisibleAnywhere, Category = Camera)
+	UPROPERTY(BlueprintReadWrite, Category = Camera)
+		USpringArmComponent* CameraBoomAiming;
+
+	//UPROPERTY(VisibleAnywhere, Category = Camera)
+	UPROPERTY(BlueprintReadWrite, Category = Camera)
+		UCameraComponent* FollowingCamera;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -36,9 +48,16 @@ public:
 	UFUNCTION()
 		void MoveRight(float Value);
 	
-	UPROPERTY(VisibleAnywhere, Category = Camera)
-		USpringArmComponent* CameraBoom;
+	UFUNCTION()
+		void Sprint();
 
-	UPROPERTY(VisibleAnywhere, Category = Camera)
-		UCameraComponent* FollowingCamera;
+	UFUNCTION()
+		void StopSprint();
+
+	UFUNCTION()
+		void Aim();
+
+	UFUNCTION()
+		void StopAim();
+
 };

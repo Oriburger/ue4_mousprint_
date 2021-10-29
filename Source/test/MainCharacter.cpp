@@ -9,26 +9,30 @@ AMainCharacter::AMainCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CAMERA_BOOM"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 0.0f), FRotator(-15.0f, 0.0f, 0.0f));
-	CameraBoom->bUsePawnControlRotation = true;
-	CameraBoom->TargetArmLength = 300.0f;
-	CameraBoom->bEnableCameraLag = true;
-	CameraBoom->CameraLagSpeed = 10.0f;
+	CameraBoomNormal = CreateDefaultSubobject<USpringArmComponent>(TEXT("CAMERA_BOOM_NORMAL"));
+	CameraBoomNormal->SetupAttachment(RootComponent);
+	CameraBoomNormal->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 0.0f), FRotator(-15.0f, 0.0f, 0.0f));
+	CameraBoomNormal->bUsePawnControlRotation = true;
+	CameraBoomNormal->TargetArmLength = 250.0f;
+	CameraBoomNormal->bEnableCameraLag = true;
+	CameraBoomNormal->CameraLagSpeed = 10.0f;
+	CameraBoomNormal->SocketOffset.Y = 50;
+
+	CameraBoomAiming = CreateDefaultSubobject<USpringArmComponent>(TEXT("CAMERA_BOOM_AIMING"));
+	CameraBoomAiming->SetupAttachment(RootComponent);
+	CameraBoomAiming->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 0.0f), FRotator(-15.0f, 0.0f, 0.0f));
+	CameraBoomAiming->bUsePawnControlRotation = true;
+	CameraBoomAiming->TargetArmLength = 150.0f;
+	CameraBoomAiming->bEnableCameraLag = true;
+	CameraBoomAiming->CameraLagSpeed = 10.0f;
+	CameraBoomAiming->SocketOffset.Y = 50;
+	CameraBoomAiming->SocketOffset.Z = 30;
 
 	FollowingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FOLLOWING_CAMERA"));
-	FollowingCamera->SetupAttachment(CameraBoom);
-	GetCharacterMovement()->MaxWalkSpeed = 400;
+	FollowingCamera->SetupAttachment(CameraBoomNormal);
+	GetCharacterMovement()->MaxWalkSpeed = 200;
 
-	Weapon = CreateDefaultSubobject<UChildActorComponent>(TEXT("WEAPON"));
-	//Weapon = StaticLoadClass(UObject::StaticClass(), nullptr, TEXT("/Game/FPS_Weapon_Bundle/Blueprints/Rifle1.Rifle1_c"));
-	//Weapon->CreateChildActor();
-	
-	//Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon"));
-	
-	//Weapon->AttachTo(GetMesh(), TEXT("Weapon"), EAttachLocation::SnapToTarget);
-	
+	Weapon = CreateDefaultSubobject<UChildActorComponent>(TEXT("WEAPON"));	
 	Weapon->SetupAttachment(this->GetMesh(), TEXT("Weapon"));
 }
 
@@ -44,6 +48,8 @@ void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Sprint ÀÌº¥Æ®
+	
 }
 
 // Called to bind functionality to input
@@ -57,6 +63,12 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAxis("Turn", this, &AMainCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &AMainCharacter::AddControllerPitchInput);
+
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AMainCharacter::Sprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AMainCharacter::StopSprint);
+
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AMainCharacter::Aim);
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AMainCharacter::StopAim);
 }
 
 void AMainCharacter::MoveForward(float Value)
@@ -73,3 +85,31 @@ void AMainCharacter::MoveRight(float Value)
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
 	AddMovementInput(Direction, Value);
 }
+
+void AMainCharacter::Sprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 350;
+}
+
+void AMainCharacter::StopSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 200;
+}
+
+void AMainCharacter::Aim()
+{
+	FLatentActionInfo LatentInfo;
+	LatentInfo.CallbackTarget = this;
+	FollowingCamera->AttachToComponent(CameraBoomAiming, FAttachmentTransformRules::KeepWorldTransform);
+	UKismetSystemLibrary::MoveComponentTo(FollowingCamera, FVector(0, 0, 0), FRotator(0, 0, 0)
+							, true, true, 0.2, false, EMoveComponentAction::Type::Move, LatentInfo);
+}
+
+void AMainCharacter::StopAim()
+{
+	FLatentActionInfo LatentInfo;
+	LatentInfo.CallbackTarget = this;
+	FollowingCamera->AttachToComponent(CameraBoomNormal, FAttachmentTransformRules::KeepWorldTransform);
+	UKismetSystemLibrary::MoveComponentTo(FollowingCamera, FVector(0, 0, 0), FRotator(0, 0, 0)
+		, true, true, 0.2, false, EMoveComponentAction::Type::Move, LatentInfo);
+} 
