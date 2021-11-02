@@ -31,6 +31,8 @@ AMainCharacter::AMainCharacter()
 	FollowingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FOLLOWING_CAMERA"));
 	FollowingCamera->SetupAttachment(CameraBoomNormal);
 	GetCharacterMovement()->MaxWalkSpeed = 200;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = 150;
+	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 
 	Weapon = CreateDefaultSubobject<UChildActorComponent>(TEXT("WEAPON"));	
 	Weapon->SetupAttachment(this->GetMesh(), TEXT("Weapon"));
@@ -69,6 +71,9 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AMainCharacter::Aim);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AMainCharacter::StopAim);
+
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AMainCharacter::StartCrouch);
+	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &AMainCharacter::StopCrouch);
 }
 
 void AMainCharacter::MoveForward(float Value)
@@ -98,6 +103,8 @@ void AMainCharacter::StopSprint()
 
 void AMainCharacter::Aim()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Aim"));
+
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;
 	FollowingCamera->AttachToComponent(CameraBoomAiming, FAttachmentTransformRules::KeepWorldTransform);
@@ -107,9 +114,23 @@ void AMainCharacter::Aim()
 
 void AMainCharacter::StopAim()
 {
+	UE_LOG(LogTemp, Warning, TEXT("AimStop"));
+
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;
 	FollowingCamera->AttachToComponent(CameraBoomNormal, FAttachmentTransformRules::KeepWorldTransform);
 	UKismetSystemLibrary::MoveComponentTo(FollowingCamera, FVector(0, 0, 0), FRotator(0, 0, 0)
-		, true, true, 0.2, false, EMoveComponentAction::Type::Move, LatentInfo);
+							, true, true, 0.2, false, EMoveComponentAction::Type::Move, LatentInfo);
 } 
+
+void AMainCharacter::StartCrouch()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Crouch"));
+	ACharacter::Crouch();
+}
+
+void AMainCharacter::StopCrouch()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UnCrouch"));
+	ACharacter::UnCrouch();
+}

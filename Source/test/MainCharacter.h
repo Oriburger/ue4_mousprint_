@@ -12,6 +12,8 @@ class TEST_API AMainCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+private:
+
 public:
 	// Sets default values for this character's properties
 	AMainCharacter();
@@ -60,4 +62,9 @@ public:
 	UFUNCTION()
 		void StopAim();
 
+	UFUNCTION()
+		void StartCrouch();
+
+	UFUNCTION()
+		void StopCrouch();
 };
