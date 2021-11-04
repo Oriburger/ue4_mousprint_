@@ -12,7 +12,9 @@ class TEST_API AMainCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-private:
+public:
+	UPROPERTY(BlueprintReadWrite, Category = PlayerState)
+		bool bIsAimed;
 
 public:
 	// Sets default values for this character's properties

@@ -95,6 +95,7 @@ void AMainCharacter::MoveRight(float Value)
 
 void AMainCharacter::Sprint()
 {
+	if (bIsAimed) return;
 	GetCharacterMovement()->MaxWalkSpeed = 350;
 }
 
@@ -107,6 +108,9 @@ void AMainCharacter::Aim()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Aim"));
 
+	bIsAimed = true;
+	StopSprint();
+
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;
 	FollowingCamera->AttachToComponent(CameraBoomAiming, FAttachmentTransformRules::KeepWorldTransform);
@@ -117,6 +121,8 @@ void AMainCharacter::Aim()
 void AMainCharacter::StopAim()
 {
 	UE_LOG(LogTemp, Warning, TEXT("AimStop"));
+
+	bIsAimed = false;
 
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;
