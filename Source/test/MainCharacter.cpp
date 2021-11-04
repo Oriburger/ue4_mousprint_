@@ -33,6 +33,7 @@ AMainCharacter::AMainCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 200;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = 150;
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+	this->bUseControllerRotationYaw = false;
 
 	Weapon = CreateDefaultSubobject<UChildActorComponent>(TEXT("WEAPON"));	
 	Weapon->SetupAttachment(this->GetMesh(), TEXT("Weapon"));
@@ -79,8 +80,8 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void AMainCharacter::MoveForward(float Value)
 {
 	//현재 Controller의 X 방향으로 Value 만큼 이동
-	//FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
 	FVector Direction = FRotationMatrix(this->GetActorRotation()).GetScaledAxis(EAxis::X);
+	if (abs(Value) > 0) this->SetActorRotation({0, Controller->GetControlRotation().Yaw, 0});
 	AddMovementInput(Direction, Value);
 }
 
@@ -88,6 +89,7 @@ void AMainCharacter::MoveRight(float Value)
 {
 	//현재 Controller의 Y 방향으로 Value 만큼 이동
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
+	if (abs(Value) > 0) this->SetActorRotation({ 0, Controller->GetControlRotation().Yaw, 0 });
 	AddMovementInput(Direction, Value);
 }
 
