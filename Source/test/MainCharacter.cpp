@@ -33,7 +33,7 @@ AMainCharacter::AMainCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 200;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = 150;
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
-	this->bUseControllerRotationYaw = false;
+	//this->bUseControllerRotationYaw = false;
 
 	Weapon = CreateDefaultSubobject<UChildActorComponent>(TEXT("WEAPON"));	
 	Weapon->SetupAttachment(this->GetMesh(), TEXT("Weapon"));
