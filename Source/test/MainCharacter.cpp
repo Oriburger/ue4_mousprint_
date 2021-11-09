@@ -75,6 +75,8 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AMainCharacter::StartCrouch);
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &AMainCharacter::StopCrouch);
+
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AMainCharacter::StartJump);
 }
 
 void AMainCharacter::MoveForward(float Value)
@@ -141,4 +143,9 @@ void AMainCharacter::StopCrouch()
 {
 	UE_LOG(LogTemp, Warning, TEXT("UnCrouch"));
 	ACharacter::UnCrouch();
+}
+
+void AMainCharacter::StartJump()
+{
+	ACharacter::Jump();
 }

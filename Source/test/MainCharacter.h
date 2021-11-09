@@ -69,4 +69,7 @@ public:
 
 	UFUNCTION()
 		void StopCrouch();
+
+	UFUNCTION()
+		void StartJump();
 };
