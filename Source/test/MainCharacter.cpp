@@ -30,7 +30,7 @@ AMainCharacter::AMainCharacter()
 
 	FollowingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FOLLOWING_CAMERA"));
 	FollowingCamera->SetupAttachment(CameraBoomNormal);
-	GetCharacterMovement()->MaxWalkSpeed = 200;
+	GetCharacterMovement()->MaxWalkSpeed = 550;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = 150;
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	//this->bUseControllerRotationYaw = false;
@@ -51,8 +51,7 @@ void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//Sprint 이벤트
-	
+	MoveForward(1);
 }
 
 // Called to bind functionality to input
@@ -61,14 +60,14 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	//입력을 함수와 바인딩
-	PlayerInputComponent->BindAxis("MoveForward", this, &AMainCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AMainCharacter::MoveRight);
+	//PlayerInputComponent->BindAxis("MoveForward", this, &AMainCharacter::MoveForward);
+	//PlayerInputComponent->BindAxis("MoveRight", this, &AMainCharacter::MoveRight);
 
 	PlayerInputComponent->BindAxis("Turn", this, &AMainCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &AMainCharacter::AddControllerPitchInput);
 
-	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AMainCharacter::Sprint);
-	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AMainCharacter::StopSprint);
+	//PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AMainCharacter::Sprint);
+	//PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AMainCharacter::StopSprint);
 
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AMainCharacter::Aim);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AMainCharacter::StopAim);
@@ -111,7 +110,7 @@ void AMainCharacter::Aim()
 	UE_LOG(LogTemp, Warning, TEXT("Aim"));
 
 	bIsAimed = true;
-	StopSprint();
+	GetCharacterMovement()->MaxWalkSpeed = 400;
 
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;
@@ -125,6 +124,7 @@ void AMainCharacter::StopAim()
 	UE_LOG(LogTemp, Warning, TEXT("AimStop"));
 
 	bIsAimed = false;
+	GetCharacterMovement()->MaxWalkSpeed = 550;
 
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;
@@ -135,6 +135,7 @@ void AMainCharacter::StopAim()
 
 void AMainCharacter::StartCrouch()
 {
+	if (GetCharacterMovement()->IsFalling()) return;
 	UE_LOG(LogTemp, Warning, TEXT("Crouch"));
 	ACharacter::Crouch();
 }
