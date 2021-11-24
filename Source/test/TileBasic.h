@@ -13,8 +13,8 @@ class TEST_API ATileBasic : public AActor
 	GENERATED_BODY()
 
 private:
-	mutable bool SpawnFlag = false;
-	TSubclassOf<class AActor> NextTileBP;
+	bool OverlapFlag = false;
+	int NextTileIdx = -1;
 
 public:	
 	// Sets default values for this actor's properties
@@ -25,11 +25,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly)
 		UArrowComponent* EdgeArrowComponent;
 
-	UPROPERTY(VisibleDefaultsOnly)
-		UBoxComponent* SpawnTrigger;
-
-	UPROPERTY(VisibleDefaultsOnly)
-		UBoxComponent* DestroyTrigger;
+	//UPROPERTY(VisibleDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly)
+		UBoxComponent* BoxTrigger;
 
 protected:
 	// Called when the game starts or when spawned
@@ -39,18 +37,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		FTransform GetNextSpawnPoint() const;
+	
+	UFUNCTION(BlueprintCallable)
+		bool IsOverlapped() const;
+
+	UFUNCTION(BlueprintCallable)
+		int GetNextTileIdx() const;
 
 	UFUNCTION()
-		void SpawnNextTile() const;
-
-	UFUNCTION()
-		void OnEndOverlapToSpawn(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
+		void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
 								, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	UFUNCTION()
-		void OnBeginOverlapToDestroy(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
-			, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
 };
