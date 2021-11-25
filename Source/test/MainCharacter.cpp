@@ -34,6 +34,7 @@ AMainCharacter::AMainCharacter()
 	FollowingCamera->SetupAttachment(CameraBoomNormal);
 	GetCharacterMovement()->MaxWalkSpeed = 550;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = 150;
+	GetCharacterMovement()->JumpZVelocity = 350;
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	//this->bUseControllerRotationYaw = false;
 

@@ -11,7 +11,7 @@ ATileBasic::ATileBasic()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	UE_LOG(LogTemp, Warning, TEXT("Tile Constructor")); 
-
+	
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("ROOT_COMPONENT"));
 	DefaultSceneRoot->SetupAttachment(RootComponent);
 	SetRootComponent(DefaultSceneRoot);
@@ -19,14 +19,14 @@ ATileBasic::ATileBasic()
 	UE_LOG(LogTemp, Warning, TEXT("Tile Constructor0"));
 
 	EdgeArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("EDGE_ARROW"));
-	EdgeArrowComponent->SetRelativeLocationAndRotation(FVector(4000.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
-	EdgeArrowComponent->ArrowSize = 2.0f;
 	EdgeArrowComponent->SetupAttachment(RootComponent);
+	EdgeArrowComponent->SetRelativeLocationAndRotation(FVector(6000.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
+	EdgeArrowComponent->ArrowSize = 2.0f;
 
 	BoxTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BOX_TRIGGER"));
-	BoxTrigger->SetRelativeScale3D(FVector(1.0f, 7.0f, 3.0f));
-	BoxTrigger->SetRelativeLocation(FVector(1000.0f, 0.0f, 0.0f));
 	BoxTrigger->SetupAttachment(RootComponent);
+	BoxTrigger->SetRelativeScale3D(FVector(1.0f, 8.75f, 5.0f));
+	BoxTrigger->SetRelativeLocation(FVector(500.0f, 0.0f, 170.0f));
 }
 
 // Called when the game starts or when spawned
