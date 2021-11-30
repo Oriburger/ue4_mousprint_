@@ -4,6 +4,7 @@
 
 #include "EngineMinimal.h"
 #include "Weapon.h"
+#include "Bullet.h"
 #include "GameFramework/Character.h"
 #include "MainCharacter.generated.h"
 
@@ -24,16 +25,19 @@ public:
 		UChildActorComponent * Weapon;
 
 	//UPROPERTY(VisibleAnywhere, Category = Camera)
-	UPROPERTY(BlueprintReadWrite, Category = Camera)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
 		USpringArmComponent* CameraBoomNormal;
 
 	//UPROPERTY(VisibleAnywhere, Category = Camera)
-	UPROPERTY(BlueprintReadWrite, Category = Camera)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
 		USpringArmComponent* CameraBoomAiming;
 
 	//UPROPERTY(VisibleAnywhere, Category = Camera)
 	UPROPERTY(BlueprintReadWrite, Category = Camera)
 		UCameraComponent* FollowingCamera;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+		TSubclassOf<class ABullet> ProjectileClass;
 
 protected:
 	// Called when the game starts or when spawned
@@ -51,12 +55,9 @@ public:
 
 	UFUNCTION()
 		void MoveRight(float Value);
-	
-	UFUNCTION()
-		void Sprint();
 
 	UFUNCTION()
-		void StopSprint();
+		void Fire();
 
 	UFUNCTION()
 		void Aim();

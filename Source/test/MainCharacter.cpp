@@ -28,7 +28,7 @@ AMainCharacter::AMainCharacter()
 	CameraBoomAiming->bEnableCameraLag = true;
 	CameraBoomAiming->CameraLagSpeed = 10.0f;
 	CameraBoomAiming->SocketOffset.Y = 50;
-	CameraBoomAiming->SocketOffset.Z = 30;
+	CameraBoomAiming->SocketOffset.Z = 60;
 
 	FollowingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FOLLOWING_CAMERA"));
 	FollowingCamera->SetupAttachment(CameraBoomNormal);
@@ -69,8 +69,7 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("Turn", this, &AMainCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &AMainCharacter::AddControllerPitchInput);
 
-	//PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AMainCharacter::Sprint);
-	//PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AMainCharacter::StopSprint);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMainCharacter::Fire);
 
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AMainCharacter::Aim);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AMainCharacter::StopAim);
@@ -97,19 +96,32 @@ void AMainCharacter::MoveRight(float Value)
 	AddMovementInput(Direction, Value);
 }
 
-void AMainCharacter::Sprint()
+void AMainCharacter::Fire()
 {
-	if (bIsAimed) return;
-	GetCharacterMovement()->MaxWalkSpeed = 350;
-}
+	if (!ProjectileClass || !GetWorld() || !bIsAimed) return;
 
-void AMainCharacter::StopSprint()
-{
-	GetCharacterMovement()->MaxWalkSpeed = 200;
-}
+	UE_LOG(LogTemp, Warning, TEXT("Fire!!"));
+
+	FRotator BeginRotation = Controller->GetControlRotation() + FRotator(0, 2.5f, 20.0f);
+	FVector BeginLocation = Weapon->GetSocketLocation(TEXT("Muzzle"));
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+
+	ABullet* Projectile = GetWorld()->SpawnActor<ABullet>(ProjectileClass, BeginLocation, BeginRotation);
+	
+	if (Projectile)
+	{
+		FVector LaunchDirection = BeginRotation.Vector();
+
+		Projectile->FireInDirection(LaunchDirection, 5000.0f);
+	}
+}	
 
 void AMainCharacter::Aim()
 {
+	if (GetCharacterMovement()->IsFalling()) return;
 	UE_LOG(LogTemp, Warning, TEXT("Aim"));
 
 	bIsAimed = true;
