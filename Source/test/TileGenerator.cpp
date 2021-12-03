@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "Math/UnrealMathUtility.h"
 #include "TileGenerator.h"
 
 // Sets default values
@@ -16,7 +16,7 @@ void ATileGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//Init Spawn은 파생 BP 클래스에서 진행
+	SpawnTile(true, 0);
 }
 
 // Called every frame
@@ -24,9 +24,10 @@ void ATileGenerator::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (curr != nullptr && curr->IsOverlapped())
+	if (curr != nullptr && curr->IsOverlapped() && !bIsSpawningTile)
 	{
-		bCanSpawnTile = true;
+		bIsSpawningTile = true;
+		SpawnTile(false, FMath::RandRange(0, ATileBasic::GetTileTypeCount()-1));
 	}
 }
 
@@ -43,6 +44,29 @@ void ATileGenerator::SetCurrTile(ATileBasic* tmp)
 
 	prev = curr;
 	curr = tmp;
+}
+
+void ATileGenerator::SpawnTile(const bool _bIsInit, const int TileIdx)
+{
+	if (!GetWorld() || TileClassArray.GetAllocatedSize() <= TileIdx) return;
+	if (!TileClassArray[TileIdx] ) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("InitTile"));
+
+	FRotator BeginRotation = FRotator(0, 0, 0);
+	FVector BeginLocation;	
+	if (_bIsInit) BeginLocation = FVector(0, 0, 0);
+	else BeginLocation = GetNextSpawnTransform().GetLocation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+
+	ATileBasic* Tile = GetWorld()->SpawnActor<ATileBasic>(TileClassArray[TileIdx], BeginLocation, BeginRotation);
+
+	if (Tile) SetCurrTile(Tile);
+
+	bIsSpawningTile = false;
 }
 
 void ATileGenerator::DestroyPrevTile()

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TileBasic.h"
+#include "Containers/Array.h"
 #include "TileGenerator.generated.h"
 
 UCLASS()
@@ -20,8 +21,14 @@ public:
 	// Sets default values for this actor's properties
 	ATileGenerator();
 
-	UPROPERTY(BlueprintReadWrite)
-		bool bCanSpawnTile = false;
+	UPROPERTY(VisibleDefaultsOnly)
+		bool bIsSpawningTile = false;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SpawnInfo)
+	//	TSubclassOf<class ATileBasic> SpawnTileClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SpawnInfo)
+		TArray<TSubclassOf<class ATileBasic> > TileClassArray;
 
 protected:
 	// Called when the game starts or when spawned
@@ -36,6 +43,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void SetCurrTile(ATileBasic * tmp);
+
+	UFUNCTION()
+		void SpawnTile(const bool _bIsInit, const int TileIdx);
 
 	UFUNCTION(BlueprintCallable)
 		void DestroyPrevTile();

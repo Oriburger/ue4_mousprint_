@@ -98,7 +98,8 @@ void AMainCharacter::MoveRight(float Value)
 
 void AMainCharacter::Fire()
 {
-	if (!ProjectileClass || !GetWorld() || !bIsAimed) return;
+	if (!GetWorld() || !ProjectileClass || !bIsAimed) return;
+	if (GetCharacterMovement()->IsFalling()) return;
 
 	UE_LOG(LogTemp, Warning, TEXT("Fire!!"));
 
@@ -115,13 +116,12 @@ void AMainCharacter::Fire()
 	{
 		FVector LaunchDirection = BeginRotation.Vector();
 
-		Projectile->FireInDirection(LaunchDirection, 5000.0f);
+		Projectile->FireInDirection(LaunchDirection);
 	}
 }	
 
 void AMainCharacter::Aim()
 {
-	if (GetCharacterMovement()->IsFalling()) return;
 	UE_LOG(LogTemp, Warning, TEXT("Aim"));
 
 	bIsAimed = true;
@@ -163,5 +163,6 @@ void AMainCharacter::StopCrouch()
 
 void AMainCharacter::StartJump()
 {
+	if (GetCharacterMovement()->IsFalling()) return;
 	ACharacter::Jump();
 }

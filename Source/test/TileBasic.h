@@ -14,7 +14,8 @@ class TEST_API ATileBasic : public AActor
 
 private:
 	bool OverlapFlag = false;
-	int NextTileIdx = -1;
+	static const int TileTypeCnt = 3;
+	//static int SpawnedTileCnt = 0;
 
 public:	
 	// Sets default values for this actor's properties
@@ -37,14 +38,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+		static int GetTileTypeCount();
+
 	UFUNCTION(BlueprintCallable)
 		FTransform GetNextSpawnPoint() const;
 	
 	UFUNCTION(BlueprintCallable)
 		bool IsOverlapped() const;
-
-	UFUNCTION(BlueprintCallable)
-		int GetNextTileIdx() const;
 
 	UFUNCTION()
 		void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor

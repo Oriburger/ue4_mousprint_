@@ -15,8 +15,8 @@ ABullet::ABullet()
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovementComponent->SetUpdatedComponent(CollisionComponent);
-	ProjectileMovementComponent->InitialSpeed = 5000.0f;
-	ProjectileMovementComponent->MaxSpeed = 5000.0f;
+	ProjectileMovementComponent->InitialSpeed = 5500.0f;
+	ProjectileMovementComponent->MaxSpeed = 10000.0f;
 	ProjectileMovementComponent->bShouldBounce = true;
 	
 	InitialLifeSpan = 3.0f;
@@ -43,7 +43,7 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 
 }
 
-void ABullet::FireInDirection(const FVector& ShootDirection, const float FireSpeed)
+void ABullet::FireInDirection(const FVector& ShootDirection)
 {
 	ProjectileMovementComponent->Velocity = ShootDirection * ProjectileMovementComponent->InitialSpeed;
 }

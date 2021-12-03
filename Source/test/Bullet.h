@@ -35,6 +35,6 @@ public:
 			, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-		void FireInDirection(const FVector& ShootDirection, const float FireSpeed);
+		void FireInDirection(const FVector& ShootDirection);
 
 };

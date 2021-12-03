@@ -44,6 +44,11 @@ void ATileBasic::Tick(float DeltaTime)
 
 }
 
+int ATileBasic::GetTileTypeCount()
+{
+	return TileTypeCnt;
+}
+
 FTransform ATileBasic::GetNextSpawnPoint() const
 {
 	return EdgeArrowComponent->GetComponentTransform();
@@ -52,11 +57,6 @@ FTransform ATileBasic::GetNextSpawnPoint() const
 bool ATileBasic::IsOverlapped() const
 {
 	return OverlapFlag;
-}
-
-int ATileBasic::GetNextTileIdx() const
-{
-	return NextTileIdx;
 }
 
 void ATileBasic::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
