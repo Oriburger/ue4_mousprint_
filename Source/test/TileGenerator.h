@@ -45,7 +45,7 @@ public:
 		void SetCurrTile(ATileBasic * tmp);
 
 	UFUNCTION()
-		void SpawnTile(const bool _bIsInit, const int TileIdx);
+		ATileBasic* SpawnTile(const bool _bIsInit, const int TileIdx);
 
 	UFUNCTION(BlueprintCallable)
 		void DestroyPrevTile();

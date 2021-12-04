@@ -46,10 +46,10 @@ void ATileGenerator::SetCurrTile(ATileBasic* tmp)
 	curr = tmp;
 }
 
-void ATileGenerator::SpawnTile(const bool _bIsInit, const int TileIdx)
+ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, const int TileIdx)
 {
-	if (!GetWorld() || TileClassArray.GetAllocatedSize() <= TileIdx) return;
-	if (!TileClassArray[TileIdx] ) return;
+	if (!GetWorld() || TileClassArray.GetAllocatedSize() <= TileIdx) return nullptr;
+	if (!TileClassArray[TileIdx] ) return nullptr;
 
 	UE_LOG(LogTemp, Warning, TEXT("InitTile"));
 
@@ -65,8 +65,9 @@ void ATileGenerator::SpawnTile(const bool _bIsInit, const int TileIdx)
 	ATileBasic* Tile = GetWorld()->SpawnActor<ATileBasic>(TileClassArray[TileIdx], BeginLocation, BeginRotation);
 
 	if (Tile) SetCurrTile(Tile);
-
 	bIsSpawningTile = false;
+	
+	return Tile;
 }
 
 void ATileGenerator::DestroyPrevTile()
