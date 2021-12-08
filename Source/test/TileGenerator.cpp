@@ -27,6 +27,7 @@ void ATileGenerator::Tick(float DeltaTime)
 	if (curr != nullptr && curr->IsOverlapped() && !bIsSpawningTile)
 	{
 		bIsSpawningTile = true;
+		DestroyPrevTile();
 		SpawnTile(false, FMath::RandRange(0, ATileBasic::GetTileTypeCount()-1));
 	}
 }
@@ -66,6 +67,7 @@ ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, const int TileIdx)
 
 	if (Tile) SetCurrTile(Tile);
 	bIsSpawningTile = false;
+	
 	
 	return Tile;
 }

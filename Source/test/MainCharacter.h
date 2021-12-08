@@ -5,6 +5,7 @@
 #include "EngineMinimal.h"
 #include "Weapon.h"
 #include "Bullet.h"
+#include "Sound/SoundWave.h"
 #include "GameFramework/Character.h"
 #include "MainCharacter.generated.h"
 
@@ -13,23 +14,29 @@ class TEST_API AMainCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+private:
+	bool bIsAimed;
+
 public:
-	UPROPERTY(BlueprintReadWrite, Category = PlayerState)
-		bool bIsAimed;
+	UPROPERTY()
+		UGameplayStatics* GameStatic;
+
+	UPROPERTY(EditAnywhere, Category = Sound)
+		USoundWave* ShootSound;
 
 public:
 	// Sets default values for this character's properties
 	AMainCharacter();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 		UChildActorComponent * Weapon;
 
 	//UPROPERTY(VisibleAnywhere, Category = Camera)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
 		USpringArmComponent* CameraBoomNormal;
 
 	//UPROPERTY(VisibleAnywhere, Category = Camera)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
 		USpringArmComponent* CameraBoomAiming;
 
 	//UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -50,6 +57,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
+	UFUNCTION(BlueprintCallable)
+		bool GetPlayerIsAiming() const;
+
 	UFUNCTION()
 		void MoveForward(float Value);
 

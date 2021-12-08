@@ -80,6 +80,8 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AMainCharacter::StartJump);
 }
 
+bool AMainCharacter::GetPlayerIsAiming() const { return bIsAimed;  }
+
 void AMainCharacter::MoveForward(float Value)
 {
 	//현재 Controller의 X 방향으로 Value 만큼 이동
@@ -118,6 +120,8 @@ void AMainCharacter::Fire()
 
 		Projectile->FireInDirection(LaunchDirection);
 	}
+
+	GameStatic->PlaySoundAtLocation(GetWorld(), ShootSound, this->GetActorLocation(), this->GetActorRotation(), 1.0f);
 }	
 
 void AMainCharacter::Aim()
