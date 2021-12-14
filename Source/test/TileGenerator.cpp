@@ -16,27 +16,36 @@ void ATileGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SpawnTile(true, 0);
+	SpawnedTileArr.Push(SpawnTile(false, 0));
 }
 
 // Called every frame
 void ATileGenerator::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	if (curr != nullptr && curr->IsOverlapped() && !bIsSpawningTile)
+
+	if (SpawnedTileArr.Num() <= MaxSpawnTileCnt && !bIsSpawningTile)
 	{
 		bIsSpawningTile = true;
-		DestroyPrevTile();
-		SpawnTile(false, FMath::RandRange(0, ATileBasic::GetTileTypeCount()-1));
+		SpawnedTileArr.Push(SpawnTile(false, 0));
+		bIsSpawningTile = false;
+	}
+	if (SpawnedTileArr.IsValidIndex(1)
+		&& SpawnedTileArr[1]->IsOverlapped())
+	{
+		DestroyTile(SpawnedTileArr[0]);
+		SpawnedTileArr.RemoveAt(0);
 	}
 }
 
 FTransform ATileGenerator::GetNextSpawnTransform() const
 {
-	if (curr == nullptr) return FTransform();
+	if (SpawnedTileArr.Num() == 0) return FTransform();
 
-	return curr->GetNextSpawnPoint();
+	return SpawnedTileArr.Last()->GetNextSpawnPoint();
+
+	/*if (curr == nullptr) return FTransform();
+	return curr->GetNextSpawnPoint();*/
 }
 
 void ATileGenerator::SetCurrTile(ATileBasic* tmp)
@@ -63,13 +72,11 @@ ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, const int TileIdx)
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = GetInstigator();
 
-	ATileBasic* Tile = GetWorld()->SpawnActor<ATileBasic>(TileClassArray[TileIdx], BeginLocation, BeginRotation);
+	ATileBasic* NewTile = GetWorld()->SpawnActor<ATileBasic>(TileClassArray[TileIdx], BeginLocation, BeginRotation);
 
-	if (Tile) SetCurrTile(Tile);
-	bIsSpawningTile = false;
+	if (NewTile) SetCurrTile(NewTile);
 	
-	
-	return Tile;
+	return NewTile;
 }
 
 void ATileGenerator::DestroyPrevTile()
@@ -78,4 +85,10 @@ void ATileGenerator::DestroyPrevTile()
 
 	prev->Destroy();
 	prev = nullptr;
+}
+
+void ATileGenerator::DestroyTile(ATileBasic * target)
+{
+	if (target == nullptr) return;
+	target->Destroy();
 }

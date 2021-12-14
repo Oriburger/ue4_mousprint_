@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "TileBasic.h"
 #include "Containers/Array.h"
+#include "Containers/Queue.h"
 #include "TileGenerator.generated.h"
 
 UCLASS()
@@ -17,6 +18,8 @@ private:
 	ATileBasic* curr;
 	ATileBasic* prev;
 
+	TArray<ATileBasic*> SpawnedTileArr;
+
 public:	
 	// Sets default values for this actor's properties
 	ATileGenerator();
@@ -26,6 +29,9 @@ public:
 
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SpawnInfo)
 	//	TSubclassOf<class ATileBasic> SpawnTileClass;
+
+	UPROPERTY(EditAnywhere, Category = SpawnInfo)
+		int32 MaxSpawnTileCnt = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SpawnInfo)
 		TArray<TSubclassOf<class ATileBasic> > TileClassArray;
@@ -38,15 +44,18 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 		FTransform GetNextSpawnTransform() const;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 		void SetCurrTile(ATileBasic * tmp);
 
 	UFUNCTION()
 		ATileBasic* SpawnTile(const bool _bIsInit, const int TileIdx);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 		void DestroyPrevTile();
+
+	UFUNCTION()
+		void DestroyTile(ATileBasic* target);
 };
