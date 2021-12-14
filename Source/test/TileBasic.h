@@ -13,8 +13,7 @@ class TEST_API ATileBasic : public AActor
 	GENERATED_BODY()
 
 private:
-	bool OverlapFlag = false;
-	static const int TileTypeCnt = 3;
+	bool OverlapFlag = false; //플레이어가 BoxTrigger에 Overlapped 되었는가?
 	//static int SpawnedTileCnt = 0;
 
 public:	
@@ -24,11 +23,11 @@ public:
 		USceneComponent* DefaultSceneRoot;
 
 	UPROPERTY(VisibleDefaultsOnly)
-		UArrowComponent* EdgeArrowComponent;
+		UArrowComponent* EdgeArrowComponent; //타일의 스폰 방향/위치를 나타내는 Arrow
 
 	//UPROPERTY(VisibleDefaultsOnly)
-	UPROPERTY(BlueprintReadOnly)
-		UBoxComponent* BoxTrigger;
+	UPROPERTY(VisibleDefaultsOnly)
+		UBoxComponent* BoxTrigger; //플레이어의 Overlapped를 감지하는 볼륨
 
 protected:
 	// Called when the game starts or when spawned
@@ -39,13 +38,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-		static int GetTileTypeCount();
-
-	UFUNCTION(BlueprintCallable)
-		FTransform GetNextSpawnPoint() const;
+		FTransform GetNextSpawnPoint() const; //Arrow의 Transform 반환
 	
-	UFUNCTION(BlueprintCallable)
-		bool IsOverlapped() const;
+	UFUNCTION()
+		bool IsOverlapped() const; //플레이어가 BoxTrigger에 Overlapped 되었는가?
 
 	UFUNCTION()
 		void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor

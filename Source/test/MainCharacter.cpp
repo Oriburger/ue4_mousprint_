@@ -117,7 +117,6 @@ void AMainCharacter::Fire()
 	if (Projectile)
 	{
 		FVector LaunchDirection = BeginRotation.Vector();
-
 		Projectile->FireInDirection(LaunchDirection);
 	}
 

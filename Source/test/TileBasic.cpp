@@ -10,13 +10,9 @@ ATileBasic::ATileBasic()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	UE_LOG(LogTemp, Warning, TEXT("Tile Constructor")); 
-	
-	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("ROOT_COMPONENT"));
+	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("ROOT_COMPONENT")); //RootComponent 지정
 	DefaultSceneRoot->SetupAttachment(RootComponent);
-	SetRootComponent(DefaultSceneRoot);
-
-	UE_LOG(LogTemp, Warning, TEXT("Tile Constructor0"));
+	SetRootComponent(DefaultSceneRoot); //루트 컴포넌트화
 
 	EdgeArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("EDGE_ARROW"));
 	EdgeArrowComponent->SetupAttachment(RootComponent);
@@ -34,24 +30,18 @@ void ATileBasic::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	BoxTrigger->OnComponentEndOverlap.AddDynamic(this, &ATileBasic::OnEndOverlap);
+	BoxTrigger->OnComponentEndOverlap.AddDynamic(this, &ATileBasic::OnEndOverlap); //오버랩 이벤트를 추가
 }
 
 // Called every frame
 void ATileBasic::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-}
-
-int ATileBasic::GetTileTypeCount()
-{
-	return TileTypeCnt;
 }
 
 FTransform ATileBasic::GetNextSpawnPoint() const
 {
-	return EdgeArrowComponent->GetComponentTransform();
+	return EdgeArrowComponent->GetComponentTransform(); 
 }
 
 bool ATileBasic::IsOverlapped() const
@@ -62,6 +52,6 @@ bool ATileBasic::IsOverlapped() const
 void ATileBasic::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
 	, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (!OtherActor->ActorHasTag(TEXT("Player"))) return;
+	if (!OtherActor->ActorHasTag(TEXT("Player"))) return; //오버랩된 액터가 플레이어가 아니면 return;
 	OverlapFlag = true;
 }

@@ -22,29 +22,26 @@ public:
 		UGameplayStatics* GameStatic;
 
 	UPROPERTY(EditAnywhere, Category = Sound)
-		USoundWave* ShootSound;
+		USoundWave* ShootSound; //총기 발사 사운드
 
 public:
 	// Sets default values for this character's properties
 	AMainCharacter();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
-		UChildActorComponent * Weapon;
+		UChildActorComponent * Weapon; //무기 메시
 
-	//UPROPERTY(VisibleAnywhere, Category = Camera)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
-		USpringArmComponent* CameraBoomNormal;
+		USpringArmComponent* CameraBoomNormal; //Aiming을 하지 않은 CameraBoom
 
-	//UPROPERTY(VisibleAnywhere, Category = Camera)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
-		USpringArmComponent* CameraBoomAiming;
+		USpringArmComponent* CameraBoomAiming; //Aiming을 한 Zoom된 CameraBoom
 
-	//UPROPERTY(VisibleAnywhere, Category = Camera)
 	UPROPERTY(BlueprintReadWrite, Category = Camera)
-		UCameraComponent* FollowingCamera;
+		UCameraComponent* FollowingCamera; //Following Camera
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
-		TSubclassOf<class ABullet> ProjectileClass;
+		TSubclassOf<class ABullet> ProjectileClass; //무기에 딸려있는 Projectile Class -> Weapon 클래스로 옮겨질 예정
 
 protected:
 	// Called when the game starts or when spawned
@@ -58,10 +55,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	UFUNCTION(BlueprintCallable)
-		bool GetPlayerIsAiming() const;
+		bool GetPlayerIsAiming() const; //플레이어가 Aiming 중인지 반환
 
 	UFUNCTION()
-		void MoveForward(float Value);
+		void MoveForward(float Value); 
 
 	UFUNCTION()
 		void MoveRight(float Value);

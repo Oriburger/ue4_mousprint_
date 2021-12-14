@@ -15,26 +15,20 @@ class TEST_API ATileGenerator : public AActor
 	GENERATED_BODY()
 
 private:
-	ATileBasic* curr;
-	ATileBasic* prev;
-
-	TArray<ATileBasic*> SpawnedTileArr;
+	TArray<ATileBasic*> SpawnedTileArr; //스폰된 타일의 주소를 저장하는 배열
 
 public:	
 	// Sets default values for this actor's properties
 	ATileGenerator();
 
 	UPROPERTY(VisibleDefaultsOnly)
-		bool bIsSpawningTile = false;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SpawnInfo)
-	//	TSubclassOf<class ATileBasic> SpawnTileClass;
+		bool bIsSpawningTile = false; //타일이 겹치게 스폰되는 것을 방지하는 변수
 
 	UPROPERTY(EditAnywhere, Category = SpawnInfo)
-		int32 MaxSpawnTileCnt = 5;
+		int32 MaxSpawnTileCnt = 5; //맵에 스폰될 최대 타일 개수, SpawnedTileArr의 최대 크기
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SpawnInfo)
-		TArray<TSubclassOf<class ATileBasic> > TileClassArray;
+		TArray<TSubclassOf<class ATileBasic> > TileClassArray; //실제로 스폰될 타일의 BP들이 원소로 들어있음
 
 protected:
 	// Called when the game starts or when spawned
@@ -45,17 +39,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-		FTransform GetNextSpawnTransform() const;
+		FTransform GetNextSpawnTransform() const; //다음 스폰될 타일의 위치를 반환
 
 	UFUNCTION()
-		void SetCurrTile(ATileBasic * tmp);
+		ATileBasic* SpawnTile(const bool _bIsInit, const int TileIdx); //타일을 스폰
+																	   //_bIsInit : 최초 스폰 시 true로 전달 
+																	   //TileIdx : 스폰할 타일 클래스의 idx를 전달
 
 	UFUNCTION()
-		ATileBasic* SpawnTile(const bool _bIsInit, const int TileIdx);
-
-	UFUNCTION()
-		void DestroyPrevTile();
-
-	UFUNCTION()
-		void DestroyTile(ATileBasic* target);
+		void DestroyTile(ATileBasic* target); //Target 타일을 제거
 };

@@ -25,16 +25,16 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-		USphereComponent* CollisionComponent;
+		USphereComponent* CollisionComponent; //타격 감지 볼륨
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Movement)
-		UProjectileMovementComponent* ProjectileMovementComponent;
+		UProjectileMovementComponent* ProjectileMovementComponent; //발사체 물리 적용 컴포넌트
 
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor
 			, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-		void FireInDirection(const FVector& ShootDirection);
+		void FireInDirection(const FVector& ShootDirection); //ShootDirection 방향으로 발사
 
 };
