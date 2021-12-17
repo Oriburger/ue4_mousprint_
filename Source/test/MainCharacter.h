@@ -16,6 +16,7 @@ class TEST_API AMainCharacter : public ACharacter
 
 private:
 	bool bIsAimed;
+	bool bIsInGame = true; //= false;
 
 public:
 	UPROPERTY()

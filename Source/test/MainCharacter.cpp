@@ -2,6 +2,7 @@
 
 
 #include "MainCharacter.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AMainCharacter::AMainCharacter()
@@ -53,8 +54,13 @@ void AMainCharacter::BeginPlay()
 void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	if (bIsInGame)
+	{
+		MoveForward(1);
 
-	MoveForward(1);
+		//LineTraceSingleByChannel();
+	}
 }
 
 // Called to bind functionality to input
@@ -105,13 +111,25 @@ void AMainCharacter::Fire()
 
 	UE_LOG(LogTemp, Warning, TEXT("Fire!!"));
 
-	FRotator BeginRotation = Controller->GetControlRotation() + FRotator(0, 2.5f, 20.0f);
-	FVector BeginLocation = Weapon->GetSocketLocation(TEXT("Muzzle"));
+	
+
+	FHitResult LineTraceHitResult; //LineTracing의 결과가 담길 변수
+	FVector TraceBeginLocation = FollowingCamera->GetComponentLocation(); //Trace는 카메라에서 시작
+	FVector TraceEndLocation = TraceBeginLocation + (FollowingCamera->GetComponentRotation()).Vector() * 20000.0f;
+								//End는 Camera로부터 20000.0f 떨어진 지점까지
+
+
+	GetWorld()->LineTraceSingleByChannel(LineTraceHitResult, TraceBeginLocation, TraceEndLocation
+										, ECollisionChannel::ECC_Visibility); //LineTrace
+
+	FVector BeginLocation = Weapon->GetSocketLocation(TEXT("Muzzle")); //발사 시작은 Muzzle 소켓의 위치 
+	FRotator BeginRotation = UKismetMathLibrary::FindLookAtRotation(BeginLocation, LineTraceHitResult.ImpactPoint);
+							 //Muzzle 소켓에서 LineTrace이 Hit된 위치까지의 Rotataion이 발사각
+
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
-	SpawnParams.Instigator = GetInstigator();
-
+	SpawnParams.Instigator = GetInstigator(); 
 	ABullet* Projectile = GetWorld()->SpawnActor<ABullet>(ProjectileClass, BeginLocation, BeginRotation);
 	
 	if (Projectile)

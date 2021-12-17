@@ -34,7 +34,7 @@ public:
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor
 			, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void FireInDirection(const FVector& ShootDirection); //ShootDirection 방향으로 발사
 
 };
