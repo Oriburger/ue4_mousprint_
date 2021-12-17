@@ -15,10 +15,11 @@ ABullet::ABullet()
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovementComponent->SetUpdatedComponent(CollisionComponent);
-	ProjectileMovementComponent->InitialSpeed = 5500.0f; //발사체의 초기 속력
+	ProjectileMovementComponent->InitialSpeed = 9000.0f; //발사체의 초기 속력
 	ProjectileMovementComponent->MaxSpeed = 10000.0f; //발사체의 최대 속력
 	ProjectileMovementComponent->bShouldBounce = true;
-	
+	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
+
 	InitialLifeSpan = 3.0f;
 }
 
