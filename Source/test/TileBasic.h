@@ -25,9 +25,11 @@ public:
 	UPROPERTY(VisibleDefaultsOnly)
 		UArrowComponent* EdgeArrowComponent; //타일의 스폰 방향/위치를 나타내는 Arrow
 
-	//UPROPERTY(VisibleDefaultsOnly)
 	UPROPERTY(VisibleDefaultsOnly)
 		UBoxComponent* BoxTrigger; //플레이어의 Overlapped를 감지하는 볼륨
+
+	UPROPERTY(VisibleDefaultsOnly)
+		UBoxComponent* ObstacleSpawnPoint;
 
 protected:
 	// Called when the game starts or when spawned

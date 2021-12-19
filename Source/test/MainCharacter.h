@@ -29,8 +29,14 @@ public:
 	// Sets default values for this character's properties
 	AMainCharacter();
 
+	UPROPERTY(EditAnywhere, Category = CharacterSpeed)
+		float CharacterMaxWalkSpeed = 1500;
+
+	UPROPERTY(EditAnywhere, Category = CharacterSpeed)
+		float CharacterAimingWalkSpeed = 800;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
-		UChildActorComponent * Weapon; //무기 메시
+		UChildActorComponent* Weapon; //무기 메시
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
 		USpringArmComponent* CameraBoomNormal; //Aiming을 하지 않은 CameraBoom

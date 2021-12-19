@@ -33,8 +33,8 @@ AMainCharacter::AMainCharacter()
 
 	FollowingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FOLLOWING_CAMERA"));
 	FollowingCamera->SetupAttachment(CameraBoomNormal);
-	GetCharacterMovement()->MaxWalkSpeed = 550;
-	GetCharacterMovement()->MaxWalkSpeedCrouched = 150;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterAimingWalkSpeed;
 	GetCharacterMovement()->JumpZVelocity = 350;
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	//this->bUseControllerRotationYaw = false;
@@ -146,7 +146,7 @@ void AMainCharacter::Aim()
 	UE_LOG(LogTemp, Warning, TEXT("Aim"));
 
 	bIsAimed = true;
-	GetCharacterMovement()->MaxWalkSpeed = 400;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterAimingWalkSpeed;
 
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;
@@ -160,7 +160,7 @@ void AMainCharacter::StopAim()
 	UE_LOG(LogTemp, Warning, TEXT("AimStop"));
 
 	bIsAimed = false;
-	GetCharacterMovement()->MaxWalkSpeed = 550;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
 
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;

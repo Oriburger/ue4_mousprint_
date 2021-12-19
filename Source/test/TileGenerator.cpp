@@ -33,8 +33,8 @@ void ATileGenerator::Tick(float DeltaTime)
 		SpawnedTileArr.Push(SpawnTile(false, FMath::RandRange(0, 2))); //Spawn 된 타일을 Arr에 넣음
 		bIsSpawningTile = false;
 	}
-	if (SpawnedTileArr.IsValidIndex(1) //플레이어가 2번째 타일의 오버랩 볼륨에 닿았다면
-		&& SpawnedTileArr[1]->IsOverlapped())
+	if (SpawnedTileArr.IsValidIndex(3) //플레이어가 2번째 타일의 오버랩 볼륨에 닿았다면
+		&& SpawnedTileArr[3]->IsOverlapped())
 	{
 		DestroyTile(SpawnedTileArr[0]); //0번째 타일을 Destroy
 		SpawnedTileArr.RemoveAt(0); //배열로부터 제거
