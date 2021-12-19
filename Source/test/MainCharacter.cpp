@@ -115,7 +115,7 @@ void AMainCharacter::Fire()
 
 	FHitResult LineTraceHitResult; //LineTracing의 결과가 담길 변수
 	FVector TraceBeginLocation = FollowingCamera->GetComponentLocation(); //Trace는 카메라에서 시작
-	FVector TraceEndLocation = TraceBeginLocation + (FollowingCamera->GetComponentRotation()).Vector() * 20000.0f;
+	FVector TraceEndLocation = TraceBeginLocation + (FollowingCamera->GetComponentRotation()).Vector() * 200000.0f;
 								//End는 Camera로부터 20000.0f 떨어진 지점까지
 
 

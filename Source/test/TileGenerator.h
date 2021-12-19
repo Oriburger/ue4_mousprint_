@@ -16,6 +16,8 @@ class TEST_API ATileGenerator : public AActor
 
 private:
 	TArray<ATileBasic*> SpawnedTileArr; //스폰된 타일의 주소를 저장하는 배열
+	int32 LeftTileCount = 0;
+	int32 RightTileCount = 0;
 
 public:	
 	// Sets default values for this actor's properties
@@ -42,10 +44,9 @@ public:
 		FTransform GetNextSpawnTransform() const; //다음 스폰될 타일의 위치를 반환
 
 	UFUNCTION()
-		ATileBasic* SpawnTile(const bool _bIsInit, const int TileIdx); //타일을 스폰
-																	   //_bIsInit : 최초 스폰 시 true로 전달 
-																	   //TileIdx : 스폰할 타일 클래스의 idx를 전달
-
-	UFUNCTION()
+		ATileBasic* SpawnTile(const bool _bIsInit, int TileIdx); //타일을 스폰
+																 //_bIsInit : 최초 스폰 시 true로 전달 
+																 //TileIdx : 스폰할 타일 클래스의 idx를 전달
+		UFUNCTION()
 		void DestroyTile(ATileBasic* target); //Target 타일을 제거
 };

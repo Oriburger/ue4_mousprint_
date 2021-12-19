@@ -2,6 +2,8 @@
 
 #include "Math/UnrealMathUtility.h"
 #include "TileGenerator.h"
+#define LEFT_TILE_IDX 0
+#define RIGHT_TILE_IDX 1
 
 // Sets default values
 ATileGenerator::ATileGenerator()
@@ -16,7 +18,7 @@ void ATileGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SpawnedTileArr.Push(SpawnTile(true, 0)); //게임 시작 시 하나는 스폰
+	SpawnedTileArr.Push(SpawnTile(true, 2)); //게임 시작 시 하나는 스폰
 }
 
 // Called every frame
@@ -28,7 +30,7 @@ void ATileGenerator::Tick(float DeltaTime)
 	if (SpawnedTileArr.Num() <= MaxSpawnTileCnt && !bIsSpawningTile)
 	{
 		bIsSpawningTile = true; //중복 스폰 방지
-		SpawnedTileArr.Push(SpawnTile(false, 0)); //Spawn 된 타일을 Arr에 넣음
+		SpawnedTileArr.Push(SpawnTile(false, FMath::RandRange(0, 2))); //Spawn 된 타일을 Arr에 넣음
 		bIsSpawningTile = false;
 	}
 	if (SpawnedTileArr.IsValidIndex(1) //플레이어가 2번째 타일의 오버랩 볼륨에 닿았다면
@@ -46,14 +48,23 @@ FTransform ATileGenerator::GetNextSpawnTransform() const
 	return SpawnedTileArr.Last()->GetNextSpawnPoint(); //맨 앞의 타일의 Arrow Transform 반환
 }
 
-ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, const int TileIdx)
+ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, int TileIdx)
 {
 	if (!GetWorld() || TileClassArray.Num() <= TileIdx) return nullptr; //Idx 정보가 Invalid 라면 nullptr 반환
 	if (!TileClassArray[TileIdx] ) return nullptr; //BP에서 TileClassArray[TileIdx]에 클래스 지정이 되지 않았다면 nullptr반환
 
+	if (TileIdx == LEFT_TILE_IDX || TileIdx == RIGHT_TILE_IDX)
+	{
+		if (LeftTileCount == RightTileCount + 1) TileIdx = RIGHT_TILE_IDX;
+		else if (RightTileCount == LeftTileCount + 1) TileIdx = LEFT_TILE_IDX;
+		
+		if (TileIdx == LEFT_TILE_IDX) LeftTileCount++;
+		else RightTileCount++;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("InitTile")); //디버그 Log
 
-	FRotator BeginRotation = FRotator(0, 0, 0); 
+	FRotator BeginRotation = GetNextSpawnTransform().GetRotation().Rotator();
 	FVector BeginLocation;	
 	if (_bIsInit) BeginLocation = FVector(0, 0, 0); //최초 스폰 시 초기 위치는 {0,0,0}
 	else BeginLocation = GetNextSpawnTransform().GetLocation(); 
