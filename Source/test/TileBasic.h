@@ -3,6 +3,7 @@
 #pragma once
 
 #include "EngineMinimal.h"
+#include "Containers/Array.h"
 #include "GameFramework/Actor.h"
 #include "Components/ArrowComponent.h"
 #include "TileBasic.generated.h"
@@ -14,6 +15,7 @@ class TEST_API ATileBasic : public AActor
 
 private:
 	bool OverlapFlag = false; //플레이어가 BoxTrigger에 Overlapped 되었는가?
+	const int32 ObstacleCount = 5;
 	//static int SpawnedTileCnt = 0;
 
 public:	
@@ -29,7 +31,7 @@ public:
 		UBoxComponent* BoxTrigger; //플레이어의 Overlapped를 감지하는 볼륨
 
 	UPROPERTY(VisibleDefaultsOnly)
-		UBoxComponent* ObstacleSpawnPoint;
+		TArray<UBoxComponent*> ObstacleSpawnPoint;
 
 protected:
 	// Called when the game starts or when spawned

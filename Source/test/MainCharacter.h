@@ -29,10 +29,16 @@ public:
 	// Sets default values for this character's properties
 	AMainCharacter();
 
-	UPROPERTY(EditAnywhere, Category = CharacterSpeed)
+	UPROPERTY(EditAnywhere, Category = CharacterStat)
+		float CharacterMaxHP = 100;
+
+	UPROPERTY(EditAnywhere, Category = CharacterStat)
+		float CharacterCurrHP = 100;
+
+	UPROPERTY(EditAnywhere, Category = CharacterStat)
 		float CharacterMaxWalkSpeed = 1500;
 
-	UPROPERTY(EditAnywhere, Category = CharacterSpeed)
+	UPROPERTY(EditAnywhere, Category = CharacterStat)
 		float CharacterAimingWalkSpeed = 800;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
@@ -60,7 +66,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
+
 	UFUNCTION(BlueprintCallable)
 		bool GetPlayerIsAiming() const; //플레이어가 Aiming 중인지 반환
 
@@ -87,4 +93,13 @@ public:
 
 	UFUNCTION()
 		void StartJump();
+
+	UFUNCTION()
+		float TakeDamage(const float damage);
+
+	UFUNCTION()
+		void Die();
+
+	UFUNCTION()
+		void SetPlayerRagdoll(const bool flag);
 };

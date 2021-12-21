@@ -23,6 +23,12 @@ ATileBasic::ATileBasic()
 	BoxTrigger->SetupAttachment(RootComponent);
 	BoxTrigger->SetRelativeScale3D(FVector(1.0f, 8.75f, 5.0f));
 	BoxTrigger->SetRelativeLocation(FVector(500.0f, 0.0f, 170.0f));
+
+	for (int idx = 0; idx < ObstacleCount; idx++)
+	{
+		//ObstacleSpawnPoint.Add(CreateDefaultSubobject<UBoxComponent>(TEXT("OBSTACLE")));
+		//ObstacleSpawnPoint[idx]->SetupAttachment(RootComponent);
+	}
 }
 
 // Called when the game starts or when spawned

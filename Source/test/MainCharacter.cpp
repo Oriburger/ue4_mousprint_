@@ -187,3 +187,24 @@ void AMainCharacter::StartJump()
 	if (GetCharacterMovement()->IsFalling()) return;
 	ACharacter::Jump();
 }
+
+float AMainCharacter::TakeDamage(const float damage)
+{
+	CharacterCurrHP = (CharacterCurrHP - damage < 0 ? 0 : CharacterCurrHP - damage);
+
+	if (CharacterCurrHP == 0) Die();
+
+	return CharacterCurrHP;
+}
+
+void AMainCharacter::Die()
+{
+	SetPlayerRagdoll(true);
+}
+
+void AMainCharacter::SetPlayerRagdoll(const bool flag)
+{
+	GetMesh()->SetSimulatePhysics(flag);
+	if (flag) GetCharacterMovement()->DisableMovement();
+	else GetCharacterMovement()->Activate();
+}

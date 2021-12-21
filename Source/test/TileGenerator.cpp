@@ -30,7 +30,7 @@ void ATileGenerator::Tick(float DeltaTime)
 	if (SpawnedTileArr.Num() <= MaxSpawnTileCnt && !bIsSpawningTile)
 	{
 		bIsSpawningTile = true; //중복 스폰 방지
-		SpawnedTileArr.Push(SpawnTile(false, FMath::RandRange(0, 2))); //Spawn 된 타일을 Arr에 넣음
+		SpawnedTileArr.Push(SpawnTile(false, FMath::RandRange(0, TileClassArray.Num()-1))); //Spawn 된 타일을 Arr에 넣음
 		bIsSpawningTile = false;
 	}
 	if (SpawnedTileArr.IsValidIndex(3) //플레이어가 2번째 타일의 오버랩 볼륨에 닿았다면
