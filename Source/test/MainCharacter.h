@@ -53,7 +53,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = Camera)
 		UCameraComponent* FollowingCamera; //Following Camera
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 		TSubclassOf<class ABullet> ProjectileClass; //무기에 딸려있는 Projectile Class -> Weapon 클래스로 옮겨질 예정
 
 protected:
@@ -95,7 +95,7 @@ public:
 		void StartJump();
 
 	UFUNCTION()
-		float TakeDamage(const float damage);
+		virtual float TakeDamage(const float damage);
 
 	UFUNCTION()
 		void Die();

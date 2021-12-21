@@ -23,11 +23,12 @@ ATileBasic::ATileBasic()
 	BoxTrigger->SetupAttachment(RootComponent);
 	BoxTrigger->SetRelativeScale3D(FVector(1.0f, 8.75f, 5.0f));
 	BoxTrigger->SetRelativeLocation(FVector(500.0f, 0.0f, 170.0f));
-
-	for (int idx = 0; idx < ObstacleCount; idx++)
+	
+	for (int idx = 0; idx < MaxObstacleCount; idx++)
 	{
-		//ObstacleSpawnPoint.Add(CreateDefaultSubobject<UBoxComponent>(TEXT("OBSTACLE")));
-		//ObstacleSpawnPoint[idx]->SetupAttachment(RootComponent);
+		FName ObstacleName = FName("OBSTACLE" + FString::FromInt(idx));
+		ObstacleSpawnPointArray.Add(CreateDefaultSubobject<USphereComponent>(ObstacleName));
+		ObstacleSpawnPointArray[idx]->SetupAttachment(RootComponent);
 	}
 }
 
@@ -37,6 +38,13 @@ void ATileBasic::BeginPlay()
 	Super::BeginPlay();
 	
 	BoxTrigger->OnComponentEndOverlap.AddDynamic(this, &ATileBasic::OnEndOverlap); //오버랩 이벤트를 추가
+
+	InitObstacle();
+
+	if (UseObstacleCount > ObstacleSpawnPointArray.Num())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Variable \"UseObstacle\" is Overflowed!!!"));
+	}
 }
 
 // Called every frame
@@ -48,6 +56,20 @@ void ATileBasic::Tick(float DeltaTime)
 FTransform ATileBasic::GetNextSpawnPoint() const
 {
 	return EdgeArrowComponent->GetComponentTransform(); 
+}
+
+bool ATileBasic::InitObstacle()
+{
+	if (!GetWorld() || !ObstacleClass || ObstacleSpawnPointArray.Num() == 0) return false;
+	
+	for (int i = 0; i < UseObstacleCount; i++)
+	{
+		const auto target = ObstacleSpawnPointArray[i];
+		if (FMath::RandBool())
+			GetWorld()->SpawnActor<AActor>(ObstacleClass, target->GetComponentLocation(), target->GetComponentRotation());
+	}
+
+	return true;
 }
 
 bool ATileBasic::IsOverlapped() const

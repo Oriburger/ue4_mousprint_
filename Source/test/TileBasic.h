@@ -15,12 +15,16 @@ class TEST_API ATileBasic : public AActor
 
 private:
 	bool OverlapFlag = false; //플레이어가 BoxTrigger에 Overlapped 되었는가?
-	const int32 ObstacleCount = 5;
+	static const int32 MaxObstacleCount = 16;
 	//static int SpawnedTileCnt = 0;
 
 public:	
 	// Sets default values for this actor's properties
 	ATileBasic();
+
+	UPROPERTY(EditAnywhere)
+		int32 UseObstacleCount = 10;
+
 	UPROPERTY(VisibleDefaultsOnly)
 		USceneComponent* DefaultSceneRoot;
 
@@ -30,8 +34,11 @@ public:
 	UPROPERTY(VisibleDefaultsOnly)
 		UBoxComponent* BoxTrigger; //플레이어의 Overlapped를 감지하는 볼륨
 
+	UPROPERTY(EditAnywhere, Category = Obstacle)
+		TSubclassOf<class AActor> ObstacleClass;
+
 	UPROPERTY(VisibleDefaultsOnly)
-		TArray<UBoxComponent*> ObstacleSpawnPoint;
+		TArray<USphereComponent*> ObstacleSpawnPointArray;
 
 protected:
 	// Called when the game starts or when spawned
@@ -44,6 +51,9 @@ public:
 	UFUNCTION()
 		FTransform GetNextSpawnPoint() const; //Arrow의 Transform 반환
 	
+	UFUNCTION()
+		bool InitObstacle();
+
 	UFUNCTION()
 		bool IsOverlapped() const; //플레이어가 BoxTrigger에 Overlapped 되었는가?
 

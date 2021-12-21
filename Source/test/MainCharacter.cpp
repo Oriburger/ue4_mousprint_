@@ -111,8 +111,6 @@ void AMainCharacter::Fire()
 
 	UE_LOG(LogTemp, Warning, TEXT("Fire!!"));
 
-	
-
 	FHitResult LineTraceHitResult; //LineTracing의 결과가 담길 변수
 	FVector TraceBeginLocation = FollowingCamera->GetComponentLocation(); //Trace는 카메라에서 시작
 	FVector TraceEndLocation = TraceBeginLocation + (FollowingCamera->GetComponentRotation()).Vector() * 200000.0f;
