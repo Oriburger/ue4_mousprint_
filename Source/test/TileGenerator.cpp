@@ -58,7 +58,7 @@ ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, int TileIdx)
 		if (LeftTileCount == RightTileCount + 1) TileIdx = RIGHT_TILE_IDX;
 		else if (RightTileCount == LeftTileCount + 1) TileIdx = LEFT_TILE_IDX;
 		
-		if (TileIdx == LEFT_TILE_IDX) LeftTileCount++;
+		if (TileClassArray[TileIdx]) LeftTileCount++;
 		else RightTileCount++;
 	}
 
