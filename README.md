@@ -37,3 +37,4 @@
 ---
 
 - [⏹️자동 타일 생성기](https://www.notion.so/67952c4c5d554a70a7241e989203dc98)
+- [📐Linetrace 활용 발사각 교정](https://oriburger.notion.site/Linetrace-42781341c1f5400f93f24fdeef3ee83a)
