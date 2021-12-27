@@ -59,7 +59,10 @@ void AMainCharacter::Tick(float DeltaTime)
 	{
 		MoveForward(1);
 
-		//LineTraceSingleByChannel();
+		CharacterMaxWalkSpeed += DeltaTime;
+		CharacterAimingWalkSpeed += DeltaTime;
+		GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterAimingWalkSpeed;
 	}
 }
 
