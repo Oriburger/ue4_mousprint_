@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class TEST_API AtestGameModeBase : public AGameModeBase
+class MOUSPRINT_API AtestGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	

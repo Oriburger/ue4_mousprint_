@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class test : ModuleRules
+public class Mousprint : ModuleRules
 {
-	public test(ReadOnlyTargetRules Target) : base(Target)
+	public Mousprint(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	

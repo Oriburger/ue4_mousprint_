@@ -10,7 +10,7 @@
 #include "MainCharacter.generated.h"
 
 UCLASS()
-class TEST_API AMainCharacter : public ACharacter
+class MOUSPRINT_API AMainCharacter : public ACharacter
 {
 	GENERATED_BODY()
 

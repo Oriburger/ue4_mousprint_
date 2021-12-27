@@ -3,12 +3,12 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class testEditorTarget : TargetRules
+public class MousprintEditorTarget : TargetRules
 {
-	public testEditorTarget( TargetInfo Target) : base(Target)
+	public MousprintEditorTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.AddRange( new string[] { "test" } );
+		ExtraModuleNames.AddRange( new string[] { "Mousprint" } );
 	}
 }

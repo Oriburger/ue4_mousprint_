@@ -7,7 +7,7 @@
 #include "Weapon.generated.h"
 
 UCLASS()
-class TEST_API AWeapon : public AActor
+class MOUSPRINT_API AWeapon : public AActor
 {
 	GENERATED_BODY()
 	
