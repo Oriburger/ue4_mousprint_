@@ -97,7 +97,7 @@ public:
 	UFUNCTION()
 		virtual float TakeDamage(const float damage);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void Die();
 
 	UFUNCTION()

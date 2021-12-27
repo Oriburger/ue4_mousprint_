@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Math/UnrealMathUtility.h"
 #include "TileGenerator.h"
+#include "Math/UnrealMathUtility.h"
 
 #define LEFT_TILE_IDX 1
 #define RIGHT_TILE_IDX 2

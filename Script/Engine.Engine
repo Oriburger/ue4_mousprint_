@@ -1,0 +1,2 @@
+[/Script/Engine.Engine]
++ActiveGameNameRedirects=(OldGameName="/Script/test", NewGameName="/Script/Mousprint")
