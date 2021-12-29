@@ -15,8 +15,9 @@ class MOUSPRINT_API AMainCharacter : public ACharacter
 	GENERATED_BODY()
 
 private:
-	bool bIsAimed;
+	bool bIsAimed = false;
 	bool bIsInGame = true; //= false;
+	float CrouchingTime = 0;
 
 public:
 	UPROPERTY()
@@ -29,17 +30,17 @@ public:
 	// Sets default values for this character's properties
 	AMainCharacter();
 
-	UPROPERTY(EditAnywhere, Category = CharacterStat)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
 		float CharacterMaxHP = 100;
 
-	UPROPERTY(EditAnywhere, Category = CharacterStat)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
 		float CharacterCurrHP = 100;
 
-	UPROPERTY(EditAnywhere, Category = CharacterStat)
-		float CharacterMaxWalkSpeed = 1500;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
+		float CharacterMaxWalkSpeed = 1000;
 
-	UPROPERTY(EditAnywhere, Category = CharacterStat)
-		float CharacterAimingWalkSpeed = 800;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
+		float CharacterAimingWalkSpeed = 500;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 		UChildActorComponent* Weapon; //무기 메시
@@ -86,10 +87,10 @@ public:
 		void StopAim();
 
 	UFUNCTION()
-		void StartCrouch();
+		void StartSlide();
 
 	UFUNCTION()
-		void StopCrouch();
+		void StopSlide();
 
 	UFUNCTION()
 		void StartJump();

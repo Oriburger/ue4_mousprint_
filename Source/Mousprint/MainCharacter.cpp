@@ -34,7 +34,7 @@ AMainCharacter::AMainCharacter()
 	FollowingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FOLLOWING_CAMERA"));
 	FollowingCamera->SetupAttachment(CameraBoomNormal);
 	GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
-	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterAimingWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxWalkSpeed;
 	GetCharacterMovement()->JumpZVelocity = 350;
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	//this->bUseControllerRotationYaw = false;
@@ -55,14 +55,24 @@ void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
+	if (GetCharacterMovement()->IsCrouching())
+	{
+		CrouchingTime += DeltaTime;
+		if (CrouchingTime > 1.0f)
+		{
+			StopSlide();
+			CrouchingTime = 0;
+		}
+	}
+
 	if (bIsInGame)
 	{
 		MoveForward(1);
 
-		CharacterMaxWalkSpeed += DeltaTime;
-		CharacterAimingWalkSpeed += DeltaTime;
+		CharacterMaxWalkSpeed += DeltaTime*10;
+		CharacterAimingWalkSpeed += DeltaTime*10;
 		GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
-		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterAimingWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxWalkSpeed;
 	}
 }
 
@@ -73,7 +83,7 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	//입력을 함수와 바인딩
 	//PlayerInputComponent->BindAxis("MoveForward", this, &AMainCharacter::MoveForward);
-	//PlayerInputComponent->BindAxis("MoveRight", this, &AMainCharacter::MoveRight);
+	PlayerInputComponent->BindAxis("MoveRight", this, &AMainCharacter::MoveRight);
 
 	PlayerInputComponent->BindAxis("Turn", this, &AMainCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &AMainCharacter::AddControllerPitchInput);
@@ -83,8 +93,8 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AMainCharacter::Aim);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AMainCharacter::StopAim);
 
-	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AMainCharacter::StartCrouch);
-	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &AMainCharacter::StopCrouch);
+	PlayerInputComponent->BindAction("Slide", IE_Pressed, this, &AMainCharacter::StartSlide);
+	//PlayerInputComponent->BindAction("Slide", IE_Released, this, &AMainCharacter::StopSlide);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AMainCharacter::StartJump);
 }
@@ -104,7 +114,8 @@ void AMainCharacter::MoveRight(float Value)
 	//현재 Controller의 Y 방향으로 Value 만큼 이동
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
 	if (abs(Value) > 0) this->SetActorRotation({ 0, Controller->GetControlRotation().Yaw, 0 });
-	AddMovementInput(Direction, Value);
+	AddMovementInput(Direction, Value*10);
+	MoveForward(abs(Value*10));
 }
 
 void AMainCharacter::Fire()
@@ -170,14 +181,14 @@ void AMainCharacter::StopAim()
 							, true, true, 0.2, false, EMoveComponentAction::Type::Move, LatentInfo);
 } 
 
-void AMainCharacter::StartCrouch()
+void AMainCharacter::StartSlide()
 {
 	if (GetCharacterMovement()->IsFalling()) return;
 	UE_LOG(LogTemp, Warning, TEXT("Crouch"));
 	ACharacter::Crouch();
 }
 
-void AMainCharacter::StopCrouch()
+void AMainCharacter::StopSlide()
 {
 	UE_LOG(LogTemp, Warning, TEXT("UnCrouch"));
 	ACharacter::UnCrouch();
