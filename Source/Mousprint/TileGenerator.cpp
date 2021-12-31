@@ -3,23 +3,18 @@
 #include "TileGenerator.h"
 #include "Math/UnrealMathUtility.h"
 
-#define LEFT_TILE_IDX 1
-#define RIGHT_TILE_IDX 2
-
 // Sets default values
 ATileGenerator::ATileGenerator()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
 void ATileGenerator::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SpawnedTileArr.Push(SpawnTile(true, 0)); //게임 시작 시 하나는 스폰
+	SpawnedTileArr.Push(SpawnTile(true, 0, false)); //게임 시작 시 하나는 스폰
 }
 
 // Called every frame
@@ -31,7 +26,10 @@ void ATileGenerator::Tick(float DeltaTime)
 	if (SpawnedTileArr.Num() <= MaxSpawnTileCnt && !bIsSpawningTile)
 	{
 		bIsSpawningTile = true; //중복 스폰 방지
-		SpawnedTileArr.Push(SpawnTile(false, FMath::RandRange(1, TileClassArray.Num()-1))); //Spawn 된 타일을 Arr에 넣음
+		bool bIsCurve = FMath::RandBool();
+		if(bIsCurve) SpawnedTileArr.Push(SpawnTile(false, FMath::RandRange(1, CurveTileClassArray.Num() - 1), bIsCurve)); //Spawn 된 타일을 Arr에 넣음
+		else SpawnedTileArr.Push(SpawnTile(false, FMath::RandRange(1, StraightTileClassArray.Num() - 1), bIsCurve));
+		 
 		bIsSpawningTile = false;
 	}
 	if (SpawnedTileArr.IsValidIndex(3) //플레이어가 2번째 타일의 오버랩 볼륨에 닿았다면
@@ -45,23 +43,22 @@ void ATileGenerator::Tick(float DeltaTime)
 FTransform ATileGenerator::GetNextSpawnTransform() const
 {
 	if (SpawnedTileArr.Num() == 0) return FTransform(); //배열이 비었다면 기본 Transform 반환
-
 	return SpawnedTileArr.Last()->GetNextSpawnPoint(); //맨 앞의 타일의 Arrow Transform 반환
 }
 
-ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, int TileIdx)
+ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, int TileIdx, bool bIsCurve)
 {
-	if (!GetWorld() || TileClassArray.Num() <= TileIdx) return nullptr; //Idx 정보가 Invalid 라면 nullptr 반환
-	if (!TileClassArray[TileIdx] ) return nullptr; //BP에서 TileClassArray[TileIdx]에 클래스 지정이 되지 않았다면 nullptr반환
-
-	if (TileIdx == LEFT_TILE_IDX || TileIdx == RIGHT_TILE_IDX) //생성할 타일이 왼쪽, 혹은 오른쪽으로 가는 타일이라면?
+	if (!GetWorld()) return nullptr; //Idx 정보가 Invalid 라면 nullptr 반환
+	if (bIsCurve)
 	{
-		if (LeftTileCount == RightTileCount + 1) TileIdx = RIGHT_TILE_IDX; 
-		else if (RightTileCount == LeftTileCount + 1) TileIdx = LEFT_TILE_IDX;
-		
-		if (TileIdx == LEFT_TILE_IDX) LeftTileCount++;
-		else RightTileCount++;
+		if (prevCurveTileType && TileIdx % 2 == 1) TileIdx -= 1;
+		else if (!prevCurveTileType && TileIdx % 2 == 0) TileIdx += 1;
+		prevCurveTileType = (TileIdx % 2 == 1);
 	}
+
+	TSubclassOf<class ATileBasic>& SpawnTarget = (bIsCurve ? CurveTileClassArray[TileIdx] : StraightTileClassArray[TileIdx]);
+	if (SpawnTarget == nullptr) return nullptr;
+
 
 	UE_LOG(LogTemp, Warning, TEXT("InitTile")); //디버그 Log
 
@@ -75,7 +72,7 @@ ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, int TileIdx)
 	SpawnParams.Instigator = GetInstigator(); 
 
 	//타일을 스폰하고 반환
-	ATileBasic* NewTile = GetWorld()->SpawnActor<ATileBasic>(TileClassArray[TileIdx], BeginLocation, BeginRotation);
+	ATileBasic* NewTile = GetWorld()->SpawnActor<ATileBasic>(SpawnTarget, BeginLocation, BeginRotation);
 	
 	return NewTile;
 }

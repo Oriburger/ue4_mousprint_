@@ -16,8 +16,7 @@ class MOUSPRINT_API ATileGenerator : public AActor
 
 private:
 	TArray<ATileBasic*> SpawnedTileArr; //스폰된 타일의 주소를 저장하는 배열
-	int32 LeftTileCount = 0;
-	int32 RightTileCount = 0;
+	bool prevCurveTileType = 0; //0 왼쪽 1 오른쪽
 
 public:	
 	// Sets default values for this actor's properties
@@ -30,7 +29,10 @@ public:
 		int32 MaxSpawnTileCnt = 5; //맵에 스폰될 최대 타일 개수, SpawnedTileArr의 최대 크기
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SpawnInfo)
-		TArray<TSubclassOf<class ATileBasic> > TileClassArray; //실제로 스폰될 타일의 BP들이 원소로 들어있음
+		TArray<TSubclassOf<class ATileBasic> > CurveTileClassArray; //실제로 스폰될 타일의 BP들이 원소로 들어있음
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SpawnInfo)
+		TArray<TSubclassOf<class ATileBasic> > StraightTileClassArray;
 
 protected:
 	// Called when the game starts or when spawned
@@ -44,7 +46,7 @@ public:
 		FTransform GetNextSpawnTransform() const; //다음 스폰될 타일의 위치를 반환
 
 	UFUNCTION()
-		ATileBasic* SpawnTile(const bool _bIsInit, int TileIdx); //타일을 스폰
+		ATileBasic* SpawnTile(const bool _bIsInit, int TileIdx, bool bIsCurve); //타일을 스폰
 																 //_bIsInit : 최초 스폰 시 true로 전달 
 																 //TileIdx : 스폰할 타일 클래스의 idx를 전달
 		UFUNCTION()
