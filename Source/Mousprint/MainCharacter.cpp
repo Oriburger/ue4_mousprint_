@@ -58,11 +58,7 @@ void AMainCharacter::Tick(float DeltaTime)
 	if (GetCharacterMovement()->IsCrouching())
 	{
 		CrouchingTime += DeltaTime;
-		if (CrouchingTime > 1.0f)
-		{
-			StopSlide();
-			CrouchingTime = 0;
-		}
+		if (CrouchingTime > 0.7f) StopSlide();
 	}
 
 	if (bIsInGame)
@@ -192,6 +188,7 @@ void AMainCharacter::StopSlide()
 {
 	UE_LOG(LogTemp, Warning, TEXT("UnCrouch"));
 	ACharacter::UnCrouch();
+	CrouchingTime = 0;
 }
 
 void AMainCharacter::StartJump()
