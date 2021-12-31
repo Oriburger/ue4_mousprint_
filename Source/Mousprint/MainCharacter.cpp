@@ -54,19 +54,19 @@ void AMainCharacter::BeginPlay()
 void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	if (GetCharacterMovement()->IsCrouching())
-	{
-		CrouchingTime += DeltaTime;
-		if (CrouchingTime > 0.7f) StopSlide();
-	}
 
 	if (bIsInGame)
 	{
+		if (GetCharacterMovement()->IsCrouching())
+		{
+			CrouchingTime += DeltaTime;
+			if (CrouchingTime > 0.5f) StopSlide();
+		}
+
 		MoveForward(1);
 
-		CharacterMaxWalkSpeed += DeltaTime*10;
-		CharacterAimingWalkSpeed += DeltaTime*10;
+		CharacterMaxWalkSpeed += DeltaTime*5;
+		CharacterAimingWalkSpeed += DeltaTime*5;
 		GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
 		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxWalkSpeed;
 	}
@@ -116,8 +116,8 @@ void AMainCharacter::MoveRight(float Value)
 
 void AMainCharacter::Fire()
 {
-	if (!GetWorld() || !ProjectileClass || !bIsAimed) return;
-	if (GetCharacterMovement()->IsFalling()) return;
+	if (!GetWorld() || !ProjectileClass || !bIsAimed || bIsDead) return;
+	if (GetCharacterMovement()->IsFalling() || GetCharacterMovement()->IsCrouching()) return;
 
 	UE_LOG(LogTemp, Warning, TEXT("Fire!!"));
 
@@ -151,6 +151,7 @@ void AMainCharacter::Fire()
 
 void AMainCharacter::Aim()
 {
+	if (bIsDead) return;
 	UE_LOG(LogTemp, Warning, TEXT("Aim"));
 
 	bIsAimed = true;
@@ -179,7 +180,7 @@ void AMainCharacter::StopAim()
 
 void AMainCharacter::StartSlide()
 {
-	if (GetCharacterMovement()->IsFalling()) return;
+	if (GetCharacterMovement()->IsFalling() || bIsDead) return;
 	UE_LOG(LogTemp, Warning, TEXT("Crouch"));
 	ACharacter::Crouch();
 }
@@ -193,7 +194,8 @@ void AMainCharacter::StopSlide()
 
 void AMainCharacter::StartJump()
 {
-	if (GetCharacterMovement()->IsFalling()) return;
+	if (GetCharacterMovement()->IsFalling() || bIsDead) return;
+	StopSlide();
 	ACharacter::Jump();
 }
 
@@ -208,6 +210,7 @@ float AMainCharacter::TakeDamage(const float damage)
 
 void AMainCharacter::Die()
 {
+	bIsDead = true;
 	SetPlayerRagdoll(true);
 }
 

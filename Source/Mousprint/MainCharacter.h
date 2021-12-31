@@ -15,6 +15,7 @@ class MOUSPRINT_API AMainCharacter : public ACharacter
 	GENERATED_BODY()
 
 private:
+	bool bIsDead = false;
 	bool bIsAimed = false;
 	bool bIsInGame = true; //= false;
 	float CrouchingTime = 0;
