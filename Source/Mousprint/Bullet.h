@@ -31,8 +31,8 @@ public:
 		UProjectileMovementComponent* ProjectileMovementComponent; //발사체 물리 적용 컴포넌트
 
 	UFUNCTION()
-		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor
-			, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp
+			, FVector NormalImpulse, const FHitResult& Hit);
 
 	UFUNCTION(BlueprintCallable)
 		void FireInDirection(const FVector& ShootDirection); //ShootDirection 방향으로 발사

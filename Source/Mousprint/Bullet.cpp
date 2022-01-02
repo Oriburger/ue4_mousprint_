@@ -28,7 +28,7 @@ void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ABullet::OnOverlapBegin); //오버랩 이벤트 추가
+	CollisionComponent->OnComponentHit.AddDynamic(this, &ABullet::OnHit); //Hit 이벤트 추가
 }
 
 // Called every frame
@@ -38,12 +38,17 @@ void ABullet::Tick(float DeltaTime)
 
 }
 
-void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor
-	, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp
+				, FVector NormalImpulse, const FHitResult& Hit)
 {
-	/*
-	 -- 추가 예정 --
-	*/
+	if (OtherComp->GetCollisionProfileName() == "Destructable")
+	{
+		const FVector force = this->GetVelocity() * 10;
+		OtherComp->AddForceAtLocation(force, this->GetActorLocation());
+
+		UE_LOG(LogTemp, Warning, TEXT("Destructable!"));
+	}
+
 }
 
 void ABullet::FireInDirection(const FVector& ShootDirection) 

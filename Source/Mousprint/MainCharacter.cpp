@@ -211,6 +211,7 @@ float AMainCharacter::TakeDamage(const float damage)
 void AMainCharacter::Die()
 {
 	bIsDead = true;
+	UE_LOG(LogTemp, Warning, TEXT("DEAD"));
 	SetPlayerRagdoll(true);
 }
 
