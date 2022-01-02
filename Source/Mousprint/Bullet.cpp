@@ -13,6 +13,10 @@ ABullet::ABullet()
 	SetRootComponent(CollisionComponent); //루트 컴포넌트화
 	CollisionComponent->InitSphereRadius(20.0f);
 
+	CollisionComponent->SetSimulatePhysics(true);
+	CollisionComponent->SetEnableGravity(false);
+	CollisionComponent->SetNotifyRigidBodyCollision(true);
+	CollisionComponent->SetCollisionProfileName(FName("Projectile"));
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovementComponent->SetUpdatedComponent(CollisionComponent);
 	ProjectileMovementComponent->InitialSpeed = 9000.0f; //발사체의 초기 속력
@@ -41,14 +45,13 @@ void ABullet::Tick(float DeltaTime)
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp
 				, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (OtherComp->GetCollisionProfileName() == "Destructable")
+	if (OtherComp->GetCollisionObjectType() == ECollisionChannel::ECC_Destructible)
 	{
-		const FVector force = this->GetVelocity() * 10;
+		const FVector force = this->GetVelocity() * 100;
 		OtherComp->AddForceAtLocation(force, this->GetActorLocation());
 
 		UE_LOG(LogTemp, Warning, TEXT("Destructable!"));
 	}
-
 }
 
 void ABullet::FireInDirection(const FVector& ShootDirection) 

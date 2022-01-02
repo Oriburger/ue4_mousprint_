@@ -119,7 +119,7 @@ void AMainCharacter::Fire()
 	if (!GetWorld() || !ProjectileClass || !bIsAimed || bIsDead) return;
 	if (GetCharacterMovement()->IsFalling() || GetCharacterMovement()->IsCrouching()) return;
 
-	UE_LOG(LogTemp, Warning, TEXT("Fire!!"));
+	//UE_LOG(LogTemp, Warning, TEXT("Fire!!"));
 
 	FHitResult LineTraceHitResult; //LineTracing의 결과가 담길 변수
 	FVector TraceBeginLocation = FollowingCamera->GetComponentLocation(); //Trace는 카메라에서 시작
@@ -152,7 +152,7 @@ void AMainCharacter::Fire()
 void AMainCharacter::Aim()
 {
 	if (bIsDead) return;
-	UE_LOG(LogTemp, Warning, TEXT("Aim"));
+	//UE_LOG(LogTemp, Warning, TEXT("Aim"));
 
 	bIsAimed = true;
 	GetCharacterMovement()->MaxWalkSpeed = CharacterAimingWalkSpeed;
@@ -166,7 +166,7 @@ void AMainCharacter::Aim()
 
 void AMainCharacter::StopAim()
 {
-	UE_LOG(LogTemp, Warning, TEXT("AimStop"));
+	//UE_LOG(LogTemp, Warning, TEXT("AimStop"));
 
 	bIsAimed = false;
 	GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
