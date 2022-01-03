@@ -65,7 +65,7 @@ bool ATileBasic::InitObstacle()
 	for (int i = 0; i < UseObstacleCount; i++)
 	{
 		const auto target = ObstacleSpawnPointArray[i];
-		if (FMath::RandBool())
+		if (FMath::RandRange(1, 100) > 20)
 			GetWorld()->SpawnActor<AActor>(ObstacleClass, target->GetComponentLocation(), target->GetComponentRotation());
 	}
 

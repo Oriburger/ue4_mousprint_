@@ -97,7 +97,7 @@ public:
 		void StartJump();
 
 	UFUNCTION()
-		virtual float TakeDamage(const float damage);
+		float TakeDamage(const float damage);
 
 	UFUNCTION(BlueprintCallable)
 		void Die();

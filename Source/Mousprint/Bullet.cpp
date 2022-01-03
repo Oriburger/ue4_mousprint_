@@ -47,10 +47,10 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 {
 	if (OtherComp->GetCollisionObjectType() == ECollisionChannel::ECC_Destructible)
 	{
-		const FVector force = this->GetVelocity() * 100;
+		const FVector force = this->GetVelocity() * 1000;
 		OtherComp->AddForceAtLocation(force, this->GetActorLocation());
 
-		UE_LOG(LogTemp, Warning, TEXT("Destructable!"));
+		UE_LOG(LogTemp, Warning, TEXT("Add Force!"));
 	}
 }
 
