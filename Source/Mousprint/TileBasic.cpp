@@ -62,6 +62,10 @@ bool ATileBasic::InitObstacle()
 {
 	if (!GetWorld() || !ObstacleClass || ObstacleSpawnPointArray.Num() == 0) return false;
 	
+	const FActorSpawnParameters SpawnParams;
+
+	//SpawnParams.Instigator = this;
+
 	for (int i = 0; i < UseObstacleCount; i++)
 	{
 		const auto target = ObstacleSpawnPointArray[i];

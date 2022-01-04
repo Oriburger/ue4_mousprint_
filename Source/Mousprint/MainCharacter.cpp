@@ -27,7 +27,7 @@ AMainCharacter::AMainCharacter()
 	CameraBoomAiming->bUsePawnControlRotation = true;
 	CameraBoomAiming->TargetArmLength = 150.0f;
 	CameraBoomAiming->bEnableCameraLag = true;
-	CameraBoomAiming->CameraLagSpeed = 10.0f;
+	CameraBoomAiming->CameraLagSpeed = 5.0f;
 	CameraBoomAiming->SocketOffset.Y = 50;
 	CameraBoomAiming->SocketOffset.Z = 60;
 
