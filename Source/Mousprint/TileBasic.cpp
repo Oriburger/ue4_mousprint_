@@ -10,6 +10,8 @@ ATileBasic::ATileBasic()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
+	this->Tags = { "Tile" };
+
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("ROOT_COMPONENT")); //RootComponent 지정
 	DefaultSceneRoot->SetupAttachment(RootComponent);
 	SetRootComponent(DefaultSceneRoot); //루트 컴포넌트화

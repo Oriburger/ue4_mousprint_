@@ -2,18 +2,38 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "EngineMinimal.h"
 #include "GameFramework/Character.h"
+#include "MainCharacter.h"
 #include "MobBase.generated.h"
 
 UCLASS()
 class MOUSPRINT_API AMobBase : public ACharacter
 {
 	GENERATED_BODY()
+private:
+	bool bIsDead = false;
+	bool bIsFlying = false;
+	AMainCharacter * target = nullptr;
 
 public:
 	// Sets default values for this character's properties
 	AMobBase();
+
+	UPROPERTY(EditAnywhere, Category = CharacterStat)
+		float CharacterMaxHP = 100;
+
+	UPROPERTY(EditAnywhere, Category = CharacterStat)
+		float CharacterCurrHP = 100;
+
+	UPROPERTY(EditAnywhere, Category = Mesh)
+		USkeletalMeshComponent* Mesh;
+
+	UPROPERTY(EditAnywhere, Category = OverlapVolume)
+		USphereComponent* EnemyDetectVolume;
+
+	UPROPERTY(EditAnywhere, Category = OverlapVolume)
+		USphereComponent* AtkRangeVolume;
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,4 +46,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION()
+		void OnBeginDetect(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
+			, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+		void OnOverlapAtkRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
+			, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };

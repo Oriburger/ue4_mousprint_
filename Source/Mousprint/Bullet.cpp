@@ -9,6 +9,8 @@ ABullet::ABullet()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	this->Tags = { "Bullet" };
+
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
 	SetRootComponent(CollisionComponent); //루트 컴포넌트화
 	CollisionComponent->InitSphereRadius(20.0f);
