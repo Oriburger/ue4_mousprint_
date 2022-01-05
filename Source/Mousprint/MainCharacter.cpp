@@ -63,7 +63,7 @@ void AMainCharacter::Tick(float DeltaTime)
 			if (CrouchingTime > 0.5f) StopSlide();
 		}
 
-		MoveForward(1);
+		//MoveForward(1);
 
 		CharacterMaxWalkSpeed += DeltaTime*5;
 		CharacterAimingWalkSpeed += DeltaTime*5;
