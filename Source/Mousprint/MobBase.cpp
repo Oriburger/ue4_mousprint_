@@ -12,11 +12,14 @@ AMobBase::AMobBase()
 
 	this->Tags = { "Mob" };
 
-	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>("Mesh");
-	Mesh->SetupAttachment(RootComponent);
-	Mesh->CreateDynamicMaterialInstance(0, );
-	Mesh->CreateDynamicMaterialInstance(1);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(88.0f);
+	GetCapsuleComponent()->SetCapsuleRadius(80.0f);
+	GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
 
+	GetMesh()->SetupAttachment(RootComponent);
+	GetMesh()->CreateDynamicMaterialInstance(0);
+	GetMesh()->CreateDynamicMaterialInstance(1);
+	
 	EnemyDetectVolume = CreateDefaultSubobject<USphereComponent>("EnemyDetectVolume");
 	EnemyDetectVolume->SetupAttachment(RootComponent);
 	EnemyDetectVolume->SetRelativeLocation(FVector(650, 0, 0));
@@ -28,7 +31,6 @@ AMobBase::AMobBase()
 	
 	GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
 	GetCharacterMovement()->MaxFlySpeed = 2000;
-	//GetCharacterMovement()-
 }
 
 // Called when the game starts or when spawned
@@ -36,8 +38,9 @@ void AMobBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	EnemyDetectVolume->OnComponentEndOverlap.AddDynamic(this, &AMobBase::OnBeginDetect); 
-	AtkRangeVolume->OnComponentEndOverlap.AddDynamic(this, &AMobBase::OnOverlapAtkRange);
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AMobBase::OnHit);
+	EnemyDetectVolume->OnComponentBeginOverlap.AddDynamic(this, &AMobBase::OnBeginDetect); 
+	AtkRangeVolume->OnComponentBeginOverlap.AddDynamic(this, &AMobBase::OnOverlapAtkRange);
 
 
 }
@@ -47,15 +50,20 @@ void AMobBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsValid(target) || !bIsDead)
+	if (target != nullptr && !bIsDead)
 	{
 		FVector MoveDirection = UKismetMathLibrary::FindLookAtRotation(GetActorLocation()
-								, target->GetActorLocation()).Vector().ForwardVector;
+								, target->GetActorLocation()).Vector();
 		AddMovementInput(MoveDirection, 1.0, false);
-
 	}
 
-	Mesh->SetVectorParameterValueOnMaterials(TEXT("Emmisive"),);
+	if (bCanExplode && bIsExploding)
+	{
+		ExplodeTime += DeltaTime*500.0f;
+		GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Emmisive"), ExplodeTime);
+
+		if (ExplodeTime > 1000) Die();
+	}
 }
 
 // Called to bind functionality to input
@@ -65,17 +73,45 @@ void AMobBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void AMobBase::OnBeginDetect(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
-	, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void AMobBase::OnBeginDetect(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp
+							, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!GetWorld() || !OtherActor->ActorHasTag("Player")) return;
 
-	target = Cast<AMainCharacter>(OtherActor);
+	target = OtherActor;
 }
 
-void AMobBase::OnOverlapAtkRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
-	, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void AMobBase::OnOverlapAtkRange(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp
+								, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 		
 }
 
+void AMobBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp
+	, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (!GetWorld()) return;
+	if (OtherActor->ActorHasTag("Projectile"))
+	{
+		DyingOpacity = 100;
+	}
+}
+
+void AMobBase::Die()
+{
+	bIsDead = true;
+	GetCharacterMovement()->SetActive(false);
+	Destroy();
+}
+
+void AMobBase::SetRagdollMode(const bool flag)
+{
+	GetMesh()->SetSimulatePhysics(flag);
+	if (flag) GetCharacterMovement()->DisableMovement();
+	else GetCharacterMovement()->Activate();
+}
+
+void AMobBase::SetExplode(bool flag)
+{
+	bIsExploding = true; 
+}

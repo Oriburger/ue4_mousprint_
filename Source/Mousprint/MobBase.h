@@ -14,20 +14,23 @@ class MOUSPRINT_API AMobBase : public ACharacter
 private:
 	bool bIsDead = false;
 	bool bIsFlying = false;
-	AMainCharacter * target = nullptr;
+	bool bIsExploding = false; 
+	float DyingOpacity = 0;
+	float ExplodeTime = 0;
+	AActor * target = nullptr;
 
 public:
 	// Sets default values for this character's properties
 	AMobBase();
+
+	UPROPERTY(EditAnywhere, Category = EffectSetting)
+		bool bCanExplode = false;
 
 	UPROPERTY(EditAnywhere, Category = CharacterStat)
 		float CharacterMaxHP = 100;
 
 	UPROPERTY(EditAnywhere, Category = CharacterStat)
 		float CharacterCurrHP = 100;
-
-	UPROPERTY(EditAnywhere, Category = Mesh)
-		USkeletalMeshComponent* Mesh;
 
 	UPROPERTY(EditAnywhere, Category = OverlapVolume)
 		USphereComponent* EnemyDetectVolume;
@@ -47,10 +50,23 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
-		void OnBeginDetect(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
-			, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+		void OnBeginDetect(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp
+			, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-		void OnOverlapAtkRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
-			, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+		void OnOverlapAtkRange(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp
+			, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp
+			, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION()
+		void Die();
+
+	UFUNCTION()
+		void SetRagdollMode(const bool flag);
+	
+	UFUNCTION(BlueprintCallable)
+		void SetExplode(bool flag);
 };
