@@ -16,20 +16,23 @@ AMainCharacter::AMainCharacter()
 	CameraBoomNormal->SetupAttachment(RootComponent);
 	CameraBoomNormal->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 0.0f), FRotator(-15.0f, 0.0f, 0.0f));
 	CameraBoomNormal->bUsePawnControlRotation = true;
+	CameraBoomNormal->ProbeChannel = ECollisionChannel::ECC_Visibility;
 	CameraBoomNormal->TargetArmLength = 250.0f;
 	CameraBoomNormal->bEnableCameraLag = true;
 	CameraBoomNormal->CameraLagSpeed = 10.0f;
-	CameraBoomNormal->SocketOffset.Y = 50;
+	CameraBoomNormal->SocketOffset.Y = 30;
+	CameraBoomNormal->SocketOffset.Z = 40;
 
 	CameraBoomAiming = CreateDefaultSubobject<USpringArmComponent>(TEXT("CAMERA_BOOM_AIMING"));
 	CameraBoomAiming->SetupAttachment(RootComponent);
 	CameraBoomAiming->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 0.0f), FRotator(-15.0f, 0.0f, 0.0f));
 	CameraBoomAiming->bUsePawnControlRotation = true;
+	CameraBoomAiming->ProbeChannel = ECollisionChannel::ECC_Visibility;
 	CameraBoomAiming->TargetArmLength = 150.0f;
 	CameraBoomAiming->bEnableCameraLag = true;
 	CameraBoomAiming->CameraLagSpeed = 5.0f;
-	CameraBoomAiming->SocketOffset.Y = 50;
-	CameraBoomAiming->SocketOffset.Z = 60;
+	CameraBoomAiming->SocketOffset.Y = 80;
+	CameraBoomAiming->SocketOffset.Z = 35;
 
 	FollowingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FOLLOWING_CAMERA"));
 	FollowingCamera->SetupAttachment(CameraBoomNormal);
@@ -65,8 +68,8 @@ void AMainCharacter::Tick(float DeltaTime)
 
 		//MoveForward(1);
 
-		CharacterMaxWalkSpeed += DeltaTime*5;
-		CharacterAimingWalkSpeed += DeltaTime*5;
+		CharacterMaxWalkSpeed += DeltaTime*3;
+		CharacterAimingWalkSpeed += DeltaTime*3;
 		GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
 		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxWalkSpeed;
 	}
@@ -97,6 +100,8 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 bool AMainCharacter::GetPlayerIsAiming() const { return bIsAimed;  }
 
+bool AMainCharacter::GetPlayerIsDead() const { return bIsDead;  }
+
 void AMainCharacter::MoveForward(float Value)
 {
 	//현재 Controller의 X 방향으로 Value 만큼 이동
@@ -117,38 +122,41 @@ void AMainCharacter::MoveRight(float Value)
 void AMainCharacter::Fire()
 {
 	if (!GetWorld() || !ProjectileClass || !bIsAimed || bIsDead) return;
-	if (GetCharacterMovement()->IsFalling() || GetCharacterMovement()->IsCrouching()) return;
+	if (GetCharacterMovement()->IsCrouching()) return;
 
 	//UE_LOG(LogTemp, Warning, TEXT("Fire!!"));
 
 	FHitResult LineTraceHitResult; //LineTracing의 결과가 담길 변수
 	FVector TraceBeginLocation = FollowingCamera->GetComponentLocation(); //Trace는 카메라에서 시작
-	//FVector TraceEndLocation = TraceBeginLocation + (FollowingCamera->GetComponentRotation()).Vector() * 200000.0f;
 	FVector TraceEndLocation = TraceBeginLocation + (FollowingCamera->GetForwardVector()) * 200000.0f;
-								//End는 Camera로부터 20000.0f 떨어진 지점까지
+	//End는 Camera로부터 20000.0f 떨어진 지점까지
 
 
 	GetWorld()->LineTraceSingleByChannel(LineTraceHitResult, TraceBeginLocation, TraceEndLocation
-										, ECollisionChannel::ECC_Camera); //LineTrace
+		, ECollisionChannel::ECC_Camera); //LineTrace
 
 	FVector BeginLocation = Weapon->GetSocketLocation(TEXT("Muzzle")); //발사 시작은 Muzzle 소켓의 위치 
 	FRotator BeginRotation = UKismetMathLibrary::FindLookAtRotation(BeginLocation, LineTraceHitResult.ImpactPoint);
-							 //Muzzle 소켓에서 LineTrace이 Hit된 위치까지의 Rotataion이 발사각
+	//Muzzle 소켓에서 LineTrace이 Hit된 위치까지의 Rotataion이 발사각
 
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
-	SpawnParams.Instigator = GetInstigator(); 
+	SpawnParams.Instigator = GetInstigator();
 	ABullet* Projectile = GetWorld()->SpawnActor<ABullet>(ProjectileClass, BeginLocation, BeginRotation);
-	
+
 	if (Projectile)
 	{
 		FVector LaunchDirection = BeginRotation.Vector();
 		Projectile->FireInDirection(LaunchDirection);
 	}
 
-	GameStatic->PlaySoundAtLocation(GetWorld(), ShootSound, this->GetActorLocation(), this->GetActorRotation(), 1.0f);
-}	
+	if (FireAnimMontage != nullptr && ShootSound != nullptr)
+	{
+		PlayAnimMontage(FireAnimMontage);
+		GameStatic->PlaySoundAtLocation(GetWorld(), ShootSound, this->GetActorLocation(), this->GetActorRotation(), 1.0f);
+	}
+}
 
 void AMainCharacter::Aim()
 {

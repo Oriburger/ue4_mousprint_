@@ -46,14 +46,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 		UChildActorComponent* Weapon; //무기 메시
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
+	UPROPERTY(BlueprintReadOnly, Category = Camera)
 		USpringArmComponent* CameraBoomNormal; //Aiming을 하지 않은 CameraBoom
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
+	UPROPERTY(BlueprintReadOnly, Category = Camera)
 		USpringArmComponent* CameraBoomAiming; //Aiming을 한 Zoom된 CameraBoom
 
-	UPROPERTY(BlueprintReadWrite, Category = Camera)
+	UPROPERTY(BlueprintReadOnly, Category = Camera)
 		UCameraComponent* FollowingCamera; //Following Camera
+
+	UPROPERTY(EditAnywhere, Category = AnimMontage)
+		UAnimMontage* FireAnimMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 		TSubclassOf<class ABullet> ProjectileClass; //무기에 딸려있는 Projectile Class -> Weapon 클래스로 옮겨질 예정
@@ -72,7 +75,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 		bool GetPlayerIsAiming() const; //플레이어가 Aiming 중인지 반환
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
+		bool GetPlayerIsDead() const; 
+
+	UFUNCTION(BlueprintCallable)
 		void MoveForward(float Value); 
 
 	UFUNCTION()
@@ -104,4 +110,5 @@ public:
 
 	UFUNCTION()
 		void SetPlayerRagdoll(const bool flag);
+
 };

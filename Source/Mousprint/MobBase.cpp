@@ -30,7 +30,7 @@ AMobBase::AMobBase()
 	AtkRangeVolume->SetRelativeScale3D(FVector(6, 6, 6));
 	
 	GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
-	GetCharacterMovement()->MaxFlySpeed = 200;
+	GetCharacterMovement()->MaxFlySpeed = 2000;
 }
 
 // Called when the game starts or when spawned
@@ -38,6 +38,8 @@ void AMobBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SpawnDefaultController();
+
 	GetMesh()->OnComponentHit.AddDynamic(this, &AMobBase::OnHit);
 	EnemyDetectVolume->OnComponentBeginOverlap.AddDynamic(this, &AMobBase::OnBeginDetect); 
 	AtkRangeVolume->OnComponentBeginOverlap.AddDynamic(this, &AMobBase::OnOverlapAtkRange);
@@ -54,7 +56,7 @@ void AMobBase::Tick(float DeltaTime)
 	if (target != nullptr && !bIsDead)
 	{
 		FRotator ToTargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation()
-									, target->GetActorLocation());
+									, target->GetActorLocation()-FVector(0, 0, 80));
 		FVector MoveDirection = ToTargetRotation.Vector();
 		SetActorRotation(FMath::Lerp<FRotator, float>(GetActorRotation(), ToTargetRotation, 0.1f));
 		AddMovementInput(MoveDirection, 1.0, false);
@@ -83,7 +85,7 @@ void AMobBase::OnOverlapAtkRange(UPrimitiveComponent* HitComp, AActor* OtherActo
 								, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!GetWorld() || OtherActor == nullptr || OtherComp == nullptr) return;
-	if (OtherActor->ActorHasTag("Player") && !bIsExploding) bIsExploding = true;
+	if (OtherActor->ActorHasTag("Player") && !bIsExploding && !bIsDying) bIsExploding = true;
 
 }
 
@@ -124,7 +126,7 @@ void AMobBase::SetRagdollMode(const bool flag)
 void AMobBase::UpdateExplosionEffect(const float DeltaTime)
 {
 	if (bIsDead) return;
-	if (ExplodeTime >= 500)
+	if (ExplodeTime >= 0.15)
 	{
 		FTransform EmitterTransform;
 		EmitterTransform.SetLocation(GetActorLocation());
@@ -138,8 +140,9 @@ void AMobBase::UpdateExplosionEffect(const float DeltaTime)
 		bIsDead = true;
 		return;
 	}
-	ExplodeTime += DeltaTime * 800.0f;
-	GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Emmisive"), ExplodeTime);
+	ExplodeTime += DeltaTime;
+
+	GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Emmisive"), ExplodeTime*500);
 }
 
 void AMobBase::UpdateEvaporatingEffect(const float DeltaTime)
