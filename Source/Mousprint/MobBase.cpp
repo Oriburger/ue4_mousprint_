@@ -12,8 +12,8 @@ AMobBase::AMobBase()
 
 	this->Tags = { "Mob" };
 
-	GetCapsuleComponent()->SetCapsuleHalfHeight(88.0f);
-	GetCapsuleComponent()->SetCapsuleRadius(80.0f);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(25.0f);
+	GetCapsuleComponent()->SetCapsuleRadius(25.0f);
 	GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
 
 	GetMesh()->SetupAttachment(RootComponent);
@@ -30,7 +30,7 @@ AMobBase::AMobBase()
 	AtkRangeVolume->SetRelativeScale3D(FVector(6, 6, 6));
 	
 	GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
-	GetCharacterMovement()->MaxFlySpeed = 2000;
+	GetCharacterMovement()->MaxFlySpeed = 200;
 }
 
 // Called when the game starts or when spawned
@@ -38,11 +38,12 @@ void AMobBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AMobBase::OnHit);
+	GetMesh()->OnComponentHit.AddDynamic(this, &AMobBase::OnHit);
 	EnemyDetectVolume->OnComponentBeginOverlap.AddDynamic(this, &AMobBase::OnBeginDetect); 
 	AtkRangeVolume->OnComponentBeginOverlap.AddDynamic(this, &AMobBase::OnOverlapAtkRange);
 
-
+	if(bHasExplodeEffect) GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Emmisive"), 0.0f);
+	if(bHasDyingEffect) GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Opacity"), 2.0f);
 }
 
 // Called every frame
@@ -52,18 +53,16 @@ void AMobBase::Tick(float DeltaTime)
 
 	if (target != nullptr && !bIsDead)
 	{
-		FVector MoveDirection = UKismetMathLibrary::FindLookAtRotation(GetActorLocation()
-								, target->GetActorLocation()).Vector();
+		FRotator ToTargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation()
+									, target->GetActorLocation());
+		FVector MoveDirection = ToTargetRotation.Vector();
+		SetActorRotation(FMath::Lerp<FRotator, float>(GetActorRotation(), ToTargetRotation, 0.1f));
 		AddMovementInput(MoveDirection, 1.0, false);
 	}
 
-	if (bCanExplode && bIsExploding)
-	{
-		ExplodeTime += DeltaTime*500.0f;
-		GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Emmisive"), ExplodeTime);
-
-		if (ExplodeTime > 1000) Die();
-	}
+	if (bHasExplodeEffect && bIsExploding && !bIsDying) UpdateExplosionEffect(DeltaTime);
+	if (bHasDyingEffect && bIsDying && !bIsExploding) UpdateEvaporatingEffect(DeltaTime);
+	if (bIsDead) Die();
 }
 
 // Called to bind functionality to input
@@ -76,31 +75,42 @@ void AMobBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AMobBase::OnBeginDetect(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp
 							, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!GetWorld() || !OtherActor->ActorHasTag("Player")) return;
-
-	target = OtherActor;
+	if (!GetWorld() || OtherActor == nullptr || OtherComp == nullptr) return;
+	if(OtherActor->ActorHasTag("Player")) target = OtherActor;
 }
 
 void AMobBase::OnOverlapAtkRange(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp
 								, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-		
+	if (!GetWorld() || OtherActor == nullptr || OtherComp == nullptr) return;
+	if (OtherActor->ActorHasTag("Player") && !bIsExploding) bIsExploding = true;
+
 }
 
 void AMobBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp
 	, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (!GetWorld()) return;
-	if (OtherActor->ActorHasTag("Projectile"))
+	if (!GetWorld() || OtherActor == nullptr || OtherComp == nullptr) return;
+	if (OtherActor->ActorHasTag("Projectile") && !bIsDying)
 	{
-		DyingOpacity = 100;
+		bIsDying = true;
+		bIsExploding = false;
+		DyingOpacity = 1.0f;
 	}
 }
 
+bool AMobBase::GetIsDead() const { return bIsDead; }
+
+bool AMobBase::GetIsFlying() const { return bIsFlying; }
+
+bool AMobBase::GetIsExploding() const { return bIsExploding; }
+
+bool AMobBase::GetIsDying() const { return bIsDying;  }
+
 void AMobBase::Die()
 {
-	bIsDead = true;
-	GetCharacterMovement()->SetActive(false);
+	GetCharacterMovement()->StopActiveMovement();
+	SetRagdollMode(true);
 	Destroy();
 }
 
@@ -111,7 +121,35 @@ void AMobBase::SetRagdollMode(const bool flag)
 	else GetCharacterMovement()->Activate();
 }
 
-void AMobBase::SetExplode(bool flag)
+void AMobBase::UpdateExplosionEffect(const float DeltaTime)
 {
-	bIsExploding = true; 
+	if (bIsDead) return;
+	if (ExplodeTime >= 500)
+	{
+		FTransform EmitterTransform;
+		EmitterTransform.SetLocation(GetActorLocation());
+		EmitterTransform.SetScale3D(FVector(2.0f, 2.0f, 2.0f));
+
+		if(ExplosionEmitter != nullptr)
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEmitter, EmitterTransform);
+		if (ExplosionSound != nullptr)
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExplosionSound, GetActorLocation(), 3.0f);
+		
+		bIsDead = true;
+		return;
+	}
+	ExplodeTime += DeltaTime * 800.0f;
+	GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Emmisive"), ExplodeTime);
+}
+
+void AMobBase::UpdateEvaporatingEffect(const float DeltaTime)
+{
+	if (DyingOpacity <= 0 || bIsDead)
+	{
+		bIsDead = true;
+		return;
+	}
+
+	DyingOpacity -= DeltaTime*2;
+	GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Opacity"), DyingOpacity);
 }

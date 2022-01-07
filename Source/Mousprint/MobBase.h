@@ -12,10 +12,11 @@ class MOUSPRINT_API AMobBase : public ACharacter
 {
 	GENERATED_BODY()
 private:
-	bool bIsDead = false;
-	bool bIsFlying = false;
-	bool bIsExploding = false; 
-	float DyingOpacity = 0;
+	bool bIsDead = false; //죽었는지 여부
+	bool bIsDying = false; //죽고 있는지 여부 
+	bool bIsFlying = true; //날고 있는지 여부
+	bool bIsExploding = false; //폭발하고 있는지 여부
+	float DyingOpacity = 1.0f; 
 	float ExplodeTime = 0;
 	AActor * target = nullptr;
 
@@ -24,7 +25,16 @@ public:
 	AMobBase();
 
 	UPROPERTY(EditAnywhere, Category = EffectSetting)
-		bool bCanExplode = false;
+		bool bHasExplodeEffect = false;
+
+	UPROPERTY(EditAnywhere, Category = EffectSetting)
+		bool bHasDyingEffect = false;
+
+	UPROPERTY(EditAnywhere, Category = EffectSetting)
+		UParticleSystem* ExplosionEmitter;
+
+	UPROPERTY(EditAnywhere, Category = EffectSetting)
+		USoundBase* ExplosionSound;
 
 	UPROPERTY(EditAnywhere, Category = CharacterStat)
 		float CharacterMaxHP = 100;
@@ -61,12 +71,30 @@ public:
 		void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp
 			, FVector NormalImpulse, const FHitResult& Hit);
 
+	UFUNCTION(BlueprintCallable)
+		bool GetIsDead() const;
+
+	UFUNCTION(BlueprintCallable)
+		bool GetIsFlying() const;
+
+	UFUNCTION(BlueprintCallable)
+		bool GetIsExploding() const;
+
+	UFUNCTION(BlueprintCallable)
+		bool GetIsDying() const;
+
+
 	UFUNCTION()
 		void Die();
 
 	UFUNCTION()
 		void SetRagdollMode(const bool flag);
 	
-	UFUNCTION(BlueprintCallable)
-		void SetExplode(bool flag);
+	UFUNCTION()
+		void UpdateExplosionEffect(const float DeltaTime);
+
+	UFUNCTION()
+		void UpdateEvaporatingEffect(const float DeltaTime);
+
+
 };
