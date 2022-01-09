@@ -56,7 +56,7 @@ void AMobBase::Tick(float DeltaTime)
 	if (target != nullptr && !bIsDead)
 	{
 		FRotator ToTargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation()
-									, target->GetActorLocation()-FVector(0, 0, 80));
+									, target->GetActorLocation());
 		FVector MoveDirection = ToTargetRotation.Vector();
 		SetActorRotation(FMath::Lerp<FRotator, float>(GetActorRotation(), ToTargetRotation, 0.1f));
 		AddMovementInput(MoveDirection, 1.0, false);
@@ -98,6 +98,7 @@ void AMobBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPri
 		bIsDying = true;
 		bIsExploding = false;
 		DyingOpacity = 1.0f;
+		GetCharacterMovement()->Deactivate();
 	}
 }
 
@@ -111,7 +112,6 @@ bool AMobBase::GetIsDying() const { return bIsDying;  }
 
 void AMobBase::Die()
 {
-	GetCharacterMovement()->StopActiveMovement();
 	SetRagdollMode(true);
 	Destroy();
 }
@@ -119,8 +119,6 @@ void AMobBase::Die()
 void AMobBase::SetRagdollMode(const bool flag)
 {
 	GetMesh()->SetSimulatePhysics(flag);
-	if (flag) GetCharacterMovement()->DisableMovement();
-	else GetCharacterMovement()->Activate();
 }
 
 void AMobBase::UpdateExplosionEffect(const float DeltaTime)
