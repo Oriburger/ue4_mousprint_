@@ -83,7 +83,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 		bool GetIsDying() const;
 
-
 	UFUNCTION()
 		void Die();
 

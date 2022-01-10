@@ -161,6 +161,7 @@ void AMainCharacter::Fire()
 void AMainCharacter::Aim()
 {
 	if (bIsDead) return;
+	if (GetCharacterMovement()->IsCrouching()) return;
 	//UE_LOG(LogTemp, Warning, TEXT("Aim"));
 
 	bIsAimed = true;
@@ -190,13 +191,16 @@ void AMainCharacter::StopAim()
 void AMainCharacter::StartSlide()
 {
 	if (GetCharacterMovement()->IsFalling() || bIsDead) return;
-	UE_LOG(LogTemp, Warning, TEXT("Crouch"));
+	if (GetCharacterMovement()->IsCrouching()) return;
+
+	StopAim();
+	//UE_LOG(LogTemp, Warning, TEXT("Crouch"));
 	ACharacter::Crouch();
 }
 
 void AMainCharacter::StopSlide()
 {
-	UE_LOG(LogTemp, Warning, TEXT("UnCrouch"));
+	//UE_LOG(LogTemp, Warning, TEXT("UnCrouch"));
 	ACharacter::UnCrouch();
 	CrouchingTime = 0;
 }

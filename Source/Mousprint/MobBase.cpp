@@ -56,7 +56,7 @@ void AMobBase::Tick(float DeltaTime)
 	if (target != nullptr && !bIsDead)
 	{
 		FRotator ToTargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation()
-									, target->GetActorLocation());
+									, target->GetActorLocation()-FVector(0, 0, 100));
 		FVector MoveDirection = ToTargetRotation.Vector();
 		SetActorRotation(FMath::Lerp<FRotator, float>(GetActorRotation(), ToTargetRotation, 0.1f));
 		AddMovementInput(MoveDirection, 1.0, false);
