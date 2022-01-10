@@ -136,8 +136,12 @@ void AMainCharacter::Fire()
 		, ECollisionChannel::ECC_Camera); //LineTrace
 
 	FVector BeginLocation = Weapon->GetSocketLocation(TEXT("Muzzle")); //발사 시작은 Muzzle 소켓의 위치 
-	FRotator BeginRotation = UKismetMathLibrary::FindLookAtRotation(BeginLocation, LineTraceHitResult.ImpactPoint);
 	//Muzzle 소켓에서 LineTrace이 Hit된 위치까지의 Rotataion이 발사각
+	FRotator BeginRotation = UKismetMathLibrary::FindLookAtRotation(BeginLocation, LineTraceHitResult.ImpactPoint);
+
+	//만약 LineTrace에 Hit 된 타겟이 없다면, 카메라의 Rotation을 따라감 
+	if (LineTraceHitResult.GetActor() == nullptr && LineTraceHitResult.GetComponent() == nullptr)
+		BeginRotation = FollowingCamera->GetComponentRotation();
 
 
 	FActorSpawnParameters SpawnParams;
