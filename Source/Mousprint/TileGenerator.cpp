@@ -62,7 +62,7 @@ ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, int TileIdx, bool bIs
 	if (SpawnTarget == nullptr) return nullptr;
 
 
-	//UE_LOG(LogTemp, Warning, TEXT("InitTile")); //디버그 Log
+	UE_LOG(LogTemp, Warning, TEXT("Tile Spawned")); //디버그 Log
 
 	FRotator BeginRotation = GetNextSpawnTransform().GetRotation().Rotator();
 	FVector BeginLocation;	

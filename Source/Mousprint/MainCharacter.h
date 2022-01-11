@@ -20,6 +20,8 @@ private:
 	bool bIsAimed = false;
 	bool bIsInGame = true; //= false;
 
+	float DisableRagdollDelay = 0;
+	float GettingUpTimeDelay = 0;
 	float CrouchingTime = 0; //슬라이딩 시간 
 
 public:
@@ -40,10 +42,16 @@ public:
 		float CharacterCurrHP = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
+		float CharacterMinWalkSpeed = 1000;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
+		float CharacterMinAimingWalkSpeed = 500;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
 		float CharacterMaxWalkSpeed = 1000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
-		float CharacterAimingWalkSpeed = 500;
+		float CharacterMaxAimingWalkSpeed = 500;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 		UChildActorComponent* Weapon; //무기 메시

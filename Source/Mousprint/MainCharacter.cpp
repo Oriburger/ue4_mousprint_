@@ -68,11 +68,29 @@ void AMainCharacter::Tick(float DeltaTime)
 	{
 		CrouchingTime += DeltaTime;
 		if (CrouchingTime > 0.5f) StopSlide(); //슬라이딩 하는 시간은 0.5초
-	}	
+	}
+
+	//Ragdoll 관련 로직
+	if (DisableRagdollDelay > 0) //Ragdoll 상태가 되고, 다시 풀릴때까지의 딜레이
+	{
+		DisableRagdollDelay = FMath::Max(0.0f, DisableRagdollDelay - DeltaTime);
+		if (DisableRagdollDelay == 0) SetPlayerRagdoll(false); 
+	}
+	else if (GettingUpTimeDelay > 0) //GettingUp AnimMontage이 실행되는 동안, bIsRagdoll 값 갱신을 딜레이
+	{
+		GettingUpTimeDelay = FMath::Max(0.0f, GettingUpTimeDelay - DeltaTime);
+		if (GettingUpTimeDelay == 0)
+		{
+			bIsRagdoll = false;
+			CharacterMaxWalkSpeed = FMath::Max(CharacterMinWalkSpeed, CharacterMaxWalkSpeed * 90 / 100);
+			CharacterMaxAimingWalkSpeed = FMath::Max(CharacterMinAimingWalkSpeed, CharacterMaxAimingWalkSpeed * 90 / 100);
+		}
+	}
+
 	//MoveForward(1);
 
-	CharacterMaxWalkSpeed += DeltaTime*3;
-	CharacterAimingWalkSpeed += DeltaTime*3;
+	CharacterMaxWalkSpeed += DeltaTime*5;
+	CharacterMaxAimingWalkSpeed += DeltaTime*5;
 	GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxWalkSpeed;
 }
@@ -106,7 +124,7 @@ bool AMainCharacter::GetPlayerIsDead() const { return bIsDead;  }
 
 void AMainCharacter::MoveForward(float Value)
 {
-	if (!GetWorld() || bIsDead) return;
+	if (!GetWorld() || bIsDead || bIsRagdoll) return;
 	//현재 Controller의 X 방향으로 Value 만큼 이동
 	FVector Direction = FRotationMatrix(this->GetActorRotation()).GetScaledAxis(EAxis::X);
 	if (abs(Value) > 0) this->SetActorRotation({0, Controller->GetControlRotation().Yaw, 0});
@@ -115,7 +133,7 @@ void AMainCharacter::MoveForward(float Value)
 
 void AMainCharacter::MoveRight(float Value)
 {
-	if (!GetWorld() || bIsDead) return;
+	if (!GetWorld() || bIsDead || bIsRagdoll) return;
 	//현재 Controller의 Y 방향으로 Value 만큼 이동
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
 	if (abs(Value) > 0) this->SetActorRotation({ 0, Controller->GetControlRotation().Yaw, 0 });
@@ -125,7 +143,7 @@ void AMainCharacter::MoveRight(float Value)
 
 void AMainCharacter::Fire()
 {
-	if (!GetWorld() || !ProjectileClass || !bIsAimed || bIsDead) return;
+	if (!GetWorld() || !ProjectileClass || !bIsAimed || bIsDead || bIsRagdoll) return;
 	if (GetCharacterMovement()->IsCrouching()) return;
 
 	//UE_LOG(LogTemp, Warning, TEXT("Fire!!"));
@@ -171,12 +189,12 @@ void AMainCharacter::Fire()
 
 void AMainCharacter::Aim()
 {
-	if (bIsDead) return;
+	if (bIsDead || bIsRagdoll) return;
 	if (GetCharacterMovement()->IsCrouching()) return;
 	//UE_LOG(LogTemp, Warning, TEXT("Aim"));
 
 	bIsAimed = true;
-	GetCharacterMovement()->MaxWalkSpeed = CharacterAimingWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterMaxAimingWalkSpeed;
 
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;
@@ -201,7 +219,7 @@ void AMainCharacter::StopAim()
 
 void AMainCharacter::StartSlide()
 {
-	if (GetCharacterMovement()->IsFalling() || bIsDead) return;
+	if (GetCharacterMovement()->IsFalling() || bIsDead || bIsRagdoll) return;
 	if (GetCharacterMovement()->IsCrouching()) return;
 
 	StopAim();
@@ -247,11 +265,15 @@ void AMainCharacter::SetPlayerRagdoll(const bool flag)
 	else //Mesh 위치를 초기화 시키며 일어나는 애니메이션을 출력
 	{
 		FAttachmentTransformRules ResetTransform = FAttachmentTransformRules::KeepRelativeTransform; 
-		GetCapsuleComponent()->SetWorldLocation(GetMesh()->GetComponentLocation());
+
+		GetCapsuleComponent()->SetWorldLocation(GetMesh()->GetComponentLocation(), false, nullptr, ETeleportType::TeleportPhysics);
 		GetMesh()->AttachToComponent(GetCapsuleComponent(), ResetTransform);
-		GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -68.0f));
+		GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -68.0f), false, nullptr, ETeleportType::TeleportPhysics);
 		GetMesh()->SetRelativeRotation({ 0.0f, -90.0f, 0.0f });
-		if(GettingUpAnimMontage!=nullptr) PlayAnimMontage(GettingUpAnimMontage, 1.75f);
+
+		if(GettingUpAnimMontage!=nullptr)
+			GettingUpTimeDelay = PlayAnimMontage(GettingUpAnimMontage, 1.5f) / 1.5f;
+
 		GetCharacterMovement()->Activate();
 	}
 }
@@ -264,6 +286,8 @@ void AMainCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor
 	if (OtherActor->ActorHasTag("Obstacle"))
 	{
 		SetPlayerRagdoll(true);
+		bIsRagdoll = true;
+		DisableRagdollDelay = 1.5f;
 	}
 
 	else if (OtherActor->ActorHasTag("Mob") && Cast<AMobBase>(OtherActor)->GetIsExploding())
