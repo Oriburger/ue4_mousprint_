@@ -2,6 +2,7 @@
 
 
 #include "MainCharacter.h"
+#include "MobBase.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -50,6 +51,8 @@ AMainCharacter::AMainCharacter()
 void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AMainCharacter::OnHit); //Hit 이벤트 추가
 	
 }
 
@@ -58,21 +61,20 @@ void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bIsInGame)
+	if (!bIsInGame) return;
+
+	//슬라이딩 자동 해제 로직
+	if (GetCharacterMovement()->IsCrouching())
 	{
-		if (GetCharacterMovement()->IsCrouching())
-		{
-			CrouchingTime += DeltaTime;
-			if (CrouchingTime > 0.5f) StopSlide();
-		}
+		CrouchingTime += DeltaTime;
+		if (CrouchingTime > 0.5f) StopSlide(); //슬라이딩 하는 시간은 0.5초
+	}	
+	//MoveForward(1);
 
-		//MoveForward(1);
-
-		CharacterMaxWalkSpeed += DeltaTime*3;
-		CharacterAimingWalkSpeed += DeltaTime*3;
-		GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
-		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxWalkSpeed;
-	}
+	CharacterMaxWalkSpeed += DeltaTime*3;
+	CharacterAimingWalkSpeed += DeltaTime*3;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxWalkSpeed;
 }
 
 // Called to bind functionality to input
@@ -104,6 +106,7 @@ bool AMainCharacter::GetPlayerIsDead() const { return bIsDead;  }
 
 void AMainCharacter::MoveForward(float Value)
 {
+	if (!GetWorld() || bIsDead) return;
 	//현재 Controller의 X 방향으로 Value 만큼 이동
 	FVector Direction = FRotationMatrix(this->GetActorRotation()).GetScaledAxis(EAxis::X);
 	if (abs(Value) > 0) this->SetActorRotation({0, Controller->GetControlRotation().Yaw, 0});
@@ -112,6 +115,7 @@ void AMainCharacter::MoveForward(float Value)
 
 void AMainCharacter::MoveRight(float Value)
 {
+	if (!GetWorld() || bIsDead) return;
 	//현재 Controller의 Y 방향으로 Value 만큼 이동
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
 	if (abs(Value) > 0) this->SetActorRotation({ 0, Controller->GetControlRotation().Yaw, 0 });
@@ -128,12 +132,13 @@ void AMainCharacter::Fire()
 
 	FHitResult LineTraceHitResult; //LineTracing의 결과가 담길 변수
 	FVector TraceBeginLocation = FollowingCamera->GetComponentLocation(); //Trace는 카메라에서 시작
-	FVector TraceEndLocation = TraceBeginLocation + (FollowingCamera->GetForwardVector()) * 200000.0f;
-	//End는 Camera로부터 20000.0f 떨어진 지점까지
+	FVector TraceEndLocation = TraceBeginLocation + (FollowingCamera->GetForwardVector()) * 200000.0f; //End는 Camera로부터 20000.0f 떨어진 지점까지
+	FCollisionQueryParams TraceCollisionQuery = FCollisionQueryParams::DefaultQueryParam;
+	TraceCollisionQuery.AddIgnoredActor(this->GetUniqueID());
 
 
 	GetWorld()->LineTraceSingleByChannel(LineTraceHitResult, TraceBeginLocation, TraceEndLocation
-		, ECollisionChannel::ECC_Camera); //LineTrace
+		, ECollisionChannel::ECC_Camera, TraceCollisionQuery); //LineTrace
 
 	FVector BeginLocation = Weapon->GetSocketLocation(TEXT("Muzzle")); //발사 시작은 Muzzle 소켓의 위치 
 	//Muzzle 소켓에서 LineTrace이 Hit된 위치까지의 Rotataion이 발사각
@@ -141,8 +146,10 @@ void AMainCharacter::Fire()
 
 	//만약 LineTrace에 Hit 된 타겟이 없다면, 카메라의 Rotation을 따라감 
 	if (LineTraceHitResult.GetActor() == nullptr && LineTraceHitResult.GetComponent() == nullptr)
+	{
 		BeginRotation = FollowingCamera->GetComponentRotation();
-
+	}
+	//UE_LOG(LogTemp, Warning, TEXT("ActorName : %s"), *UKismetSystemLibrary::GetDisplayName(LineTraceHitResult.GetActor()));
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
@@ -234,7 +241,33 @@ void AMainCharacter::Die()
 
 void AMainCharacter::SetPlayerRagdoll(const bool flag)
 {
-	GetMesh()->SetSimulatePhysics(flag);
-	if (flag) GetCharacterMovement()->DisableMovement();
-	else GetCharacterMovement()->Activate();
+	GetMesh()->SetSimulatePhysics(flag); //플레이어의 Ragdoll 상태를 flag로 지정
+	if (flag) GetCharacterMovement()->Deactivate(); //true라면, 캐릭터의 Movement를 비활성화 시킨다
+
+	else //Mesh 위치를 초기화 시키며 일어나는 애니메이션을 출력
+	{
+		FAttachmentTransformRules ResetTransform = FAttachmentTransformRules::KeepRelativeTransform; 
+		GetCapsuleComponent()->SetWorldLocation(GetMesh()->GetComponentLocation());
+		GetMesh()->AttachToComponent(GetCapsuleComponent(), ResetTransform);
+		GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -68.0f));
+		GetMesh()->SetRelativeRotation({ 0.0f, -90.0f, 0.0f });
+		if(GettingUpAnimMontage!=nullptr) PlayAnimMontage(GettingUpAnimMontage, 1.75f);
+		GetCharacterMovement()->Activate();
+	}
+}
+
+void AMainCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor
+	, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (!GetWorld() || OtherActor == nullptr) return;
+
+	if (OtherActor->ActorHasTag("Obstacle"))
+	{
+		SetPlayerRagdoll(true);
+	}
+
+	else if (OtherActor->ActorHasTag("Mob") && Cast<AMobBase>(OtherActor)->GetIsExploding())
+	{
+		
+	}
 }

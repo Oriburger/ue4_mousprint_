@@ -16,9 +16,11 @@ class MOUSPRINT_API AMainCharacter : public ACharacter
 
 private:
 	bool bIsDead = false;
+	bool bIsRagdoll = false;
 	bool bIsAimed = false;
 	bool bIsInGame = true; //= false;
-	float CrouchingTime = 0;
+
+	float CrouchingTime = 0; //슬라이딩 시간 
 
 public:
 	UPROPERTY()
@@ -57,6 +59,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = AnimMontage)
 		UAnimMontage* FireAnimMontage;
+
+	UPROPERTY(EditAnywhere, Category = AnimMontage)
+		UAnimMontage* GettingUpAnimMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 		TSubclassOf<class ABullet> ProjectileClass; //무기에 딸려있는 Projectile Class -> Weapon 클래스로 옮겨질 예정
@@ -108,7 +113,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void Die();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void SetPlayerRagdoll(const bool flag);
+
+	UFUNCTION()
+		void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp
+			, FVector NormalImpulse, const FHitResult& Hit);
 
 };
