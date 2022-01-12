@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "Kismet/KismetMathLibrary.h"
 #include "MobBase.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AMobBase::AMobBase()
