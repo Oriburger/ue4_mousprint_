@@ -17,9 +17,7 @@ AMobBase::AMobBase()
 	GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
 
 	GetMesh()->SetupAttachment(RootComponent);
-	GetMesh()->CreateDynamicMaterialInstance(0);
-	GetMesh()->CreateDynamicMaterialInstance(1);
-	
+
 	EnemyDetectVolume = CreateDefaultSubobject<USphereComponent>("EnemyDetectVolume");
 	EnemyDetectVolume->SetupAttachment(RootComponent);
 	EnemyDetectVolume->SetRelativeLocation(FVector(650, 0, 0));
@@ -126,15 +124,20 @@ void AMobBase::UpdateExplosionEffect(const float DeltaTime)
 	if (bIsDead) return;
 	if (ExplodeTime >= 0.15)
 	{
+		UGameplayStatics::ApplyRadialDamage(GetWorld(), 10.0f, GetMesh()->GetComponentLocation()
+			, 250.0f, UDamageType::StaticClass(), {}, this, nullptr);
+
 		FTransform EmitterTransform;
-		EmitterTransform.SetLocation(GetActorLocation());
+		EmitterTransform.SetLocation(this->GetActorLocation());
 		EmitterTransform.SetScale3D(FVector(2.0f, 2.0f, 2.0f));
 
 		if(ExplosionEmitter != nullptr)
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEmitter, EmitterTransform);
 		if (ExplosionSound != nullptr)
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExplosionSound, GetActorLocation(), 3.0f);
-		
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExplosionSound, this->GetActorLocation(), 3.0f);
+
+		//UE_LOG(LogTemp, Warning, TEXT("Apply Damage"));
+
 		bIsDead = true;
 		return;
 	}

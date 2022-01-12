@@ -71,6 +71,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = AnimMontage)
 		UAnimMontage* GettingUpAnimMontage;
 
+	UPROPERTY(EditAnywhere, Category = AnimMontage)
+		UAnimMontage* HitAnimMontage;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 		TSubclassOf<class ABullet> ProjectileClass; //무기에 딸려있는 Projectile Class -> Weapon 클래스로 옮겨질 예정
 
@@ -116,7 +119,8 @@ public:
 		void StartJump();
 
 	UFUNCTION()
-		float TakeDamage(const float damage);
+		virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent
+							, AController* EventInstigator, AActor * DamageCauser) override;
 
 	UFUNCTION(BlueprintCallable)
 		void Die();

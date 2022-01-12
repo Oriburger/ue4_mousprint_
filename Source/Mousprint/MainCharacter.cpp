@@ -241,13 +241,19 @@ void AMainCharacter::StartJump()
 	ACharacter::Jump();
 }
 
-float AMainCharacter::TakeDamage(const float damage)
+float AMainCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent
+	, AController* EventInstigator, AActor* DamageCauser)
 {
-	CharacterCurrHP = (CharacterCurrHP - damage < 0 ? 0 : CharacterCurrHP - damage);
+	float FinalDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
+	//UE_LOG(LogTemp, Warning, TEXT("Take Damage"));
+
+	PlayAnimMontage(HitAnimMontage, 1.5f);
+
+	CharacterCurrHP = FMath::Max(0.0f, CharacterCurrHP-Damage);
 	if (CharacterCurrHP == 0) Die();
 
-	return CharacterCurrHP;
+	return FinalDamage;
 }
 
 void AMainCharacter::Die()

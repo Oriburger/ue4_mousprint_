@@ -23,8 +23,8 @@ ATileBasic::ATileBasic()
 
 	BoxTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BOX_TRIGGER"));
 	BoxTrigger->SetupAttachment(RootComponent);
-	BoxTrigger->SetRelativeScale3D(FVector(1.0f, 8.75f, 5.0f));
-	BoxTrigger->SetRelativeLocation(FVector(500.0f, 0.0f, 170.0f));
+	BoxTrigger->SetRelativeScale3D(FVector(1.0f, 8.75f, 10.0f));
+	BoxTrigger->SetRelativeLocation(FVector(500.0f, 0.0f, 300.0f));
 	
 	for (int idx = 0; idx < MaxObstacleCount; idx++)
 	{
