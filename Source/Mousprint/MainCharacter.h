@@ -45,13 +45,13 @@ public:
 		float CharacterMinWalkSpeed = 1000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
-		float CharacterMinAimingWalkSpeed = 500;
+		float CharacterMinAimingWalkSpeed = 750;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
 		float CharacterMaxWalkSpeed = 1000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
-		float CharacterMaxAimingWalkSpeed = 500;
+		float CharacterMaxAimingWalkSpeed = 750;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 		UChildActorComponent* Weapon; //무기 메시

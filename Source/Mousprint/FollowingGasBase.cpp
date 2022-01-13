@@ -17,6 +17,11 @@ AFollowingGasBase::AFollowingGasBase()
 	PathFindingCollision->SetupAttachment(RootComponent);
 	PathFindingCollision->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
 
+	DamageCollision = CreateDefaultSubobject<USphereComponent>(TEXT("DAMAGE_COLLISION"));
+	DamageCollision->SetupAttachment(RootComponent);
+	DamageCollision->SetRelativeScale3D(FVector(20.0f, 20.0f, 20.0f));
+	DamageCollision->SetRelativeLocation(FVector(800.0f, 0.0f, 0.0f));
+
 	GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
 	GetCharacterMovement()->MaxFlySpeed = 850;
 }
@@ -26,11 +31,13 @@ void AFollowingGasBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	PathFindingCollision->OnComponentEndOverlap.AddDynamic(this, &AFollowingGasBase::OnEndOverlap);
-	PathFindingCollision->OnComponentBeginOverlap.AddDynamic(this, &AFollowingGasBase::OnBeginOverlap);
+	PathFindingCollision->OnComponentEndOverlap.AddDynamic(this, &AFollowingGasBase::PathEndOverlap);
+	PathFindingCollision->OnComponentBeginOverlap.AddDynamic(this, &AFollowingGasBase::PathBeginOverlap);
+
+	DamageCollision->OnComponentBeginOverlap.AddDynamic(this, &AFollowingGasBase::PlayerBeginOverlap);
 
 	SpawnDefaultController();
-	PathFindingCollision->SetRelativeScale3D(FVector(50.0f, 50.0f, 50.0f));
+	PathFindingCollision->SetRelativeScale3D(FVector(100.0f, 100.0f, 100.0f));
 
 	AddMovementInput(GetActorRotation().Vector().UpVector, -1.0f);
 }
@@ -47,11 +54,9 @@ void AFollowingGasBase::Tick(float DeltaTime)
 									, Target->GetActorLocation());		
 		this->SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), ToTargetRotation, 0.1f, true).Quaternion());
 		AddMovementInput(ToTargetRotation.Vector(), 1.0f);
-
-		UE_LOG(LogTemp, Warning, TEXT("Move"));
 	}
 
-	GetCharacterMovement()->MaxFlySpeed = GetCharacterMovement()->MaxFlySpeed + (DeltaTime * 7.5f);
+	GetCharacterMovement()->MaxFlySpeed = GetCharacterMovement()->MaxFlySpeed + (DeltaTime * 5.0f);
 }
 
 // Called to bind functionality to input
@@ -61,7 +66,7 @@ void AFollowingGasBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 }
 
-void AFollowingGasBase::OnBeginOverlap(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp
+void AFollowingGasBase::PathBeginOverlap(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp
 									, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor == nullptr || !OtherActor->ActorHasTag("Path")) return;
@@ -71,11 +76,22 @@ void AFollowingGasBase::OnBeginOverlap(UPrimitiveComponent* HitComp, AActor* Oth
 	Cast<APathBase>(OtherActor)->bIsChecked = true;
 }
 
-void AFollowingGasBase::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
+void AFollowingGasBase::PathEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
 									, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (OtherActor == nullptr || !OtherActor->ActorHasTag("Path")) return;
 	OtherActor->Destroy();
 
 	if(PathList.Num() > 0) PathList.RemoveAt(0);
+}
+
+void AFollowingGasBase::PlayerBeginOverlap(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp
+	, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor == nullptr || !OtherActor->ActorHasTag("Player")) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("Overlap"));
+
+	UGameplayStatics::ApplyRadialDamage(GetWorld(), 1000.0f, DamageCollision->GetComponentLocation(),
+			10000.0f, UDamageType::StaticClass(), {}, this, nullptr);
 }

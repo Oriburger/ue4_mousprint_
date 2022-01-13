@@ -89,12 +89,16 @@ void AMainCharacter::Tick(float DeltaTime)
 
 	//MoveForward(1);
 
-	CharacterCurrHP = FMath::Min(CharacterMaxHP, CharacterCurrHP + DeltaTime * 0.1f);
+	CharacterCurrHP = FMath::Min(CharacterMaxHP, CharacterCurrHP + DeltaTime);
 
-	CharacterMaxWalkSpeed += DeltaTime*10;
-	CharacterMaxAimingWalkSpeed += DeltaTime*10;
-	GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
-	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxWalkSpeed;
+	CharacterMaxWalkSpeed += DeltaTime * 7.5f;
+	CharacterMaxAimingWalkSpeed += DeltaTime * 7.5f;
+
+	if (!GetPlayerIsAiming() && !GetCharacterMovement()->IsCrouching())
+	{
+		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxAimingWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
+	}
 }
 
 // Called to bind functionality to input
@@ -224,14 +228,15 @@ void AMainCharacter::StartSlide()
 	if (GetCharacterMovement()->IsFalling() || bIsDead || bIsRagdoll) return;
 	if (GetCharacterMovement()->IsCrouching()) return;
 
-	StopAim();
 	//UE_LOG(LogTemp, Warning, TEXT("Crouch"));
+	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxWalkSpeed;
 	ACharacter::Crouch();
 }
 
 void AMainCharacter::StopSlide()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("UnCrouch"));
+	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxAimingWalkSpeed;
 	ACharacter::UnCrouch();
 	CrouchingTime = 0;
 }
