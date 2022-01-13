@@ -15,11 +15,10 @@ AFollowingGasBase::AFollowingGasBase()
 
 	PathFindingCollision = CreateDefaultSubobject<USphereComponent>(TEXT("PATH_FIND_COLLISION"));
 	PathFindingCollision->SetupAttachment(RootComponent);
-	PathFindingCollision->SetRelativeScale3D(FVector(10.0f, 10.0f, 10.0f));
+	PathFindingCollision->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
 
 	GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
-	GetCharacterMovement()->MaxFlySpeed = 750;
-	GetCharacterMovement()->MaxWalkSpeed = 2000;
+	GetCharacterMovement()->MaxFlySpeed = 850;
 }
 
 // Called when the game starts or when spawned
@@ -27,11 +26,13 @@ void AFollowingGasBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	PathFindingCollision->OnComponentEndOverlap.AddDynamic(this, &AFollowingGasBase::OnEndOverlap);
+	PathFindingCollision->OnComponentBeginOverlap.AddDynamic(this, &AFollowingGasBase::OnBeginOverlap);
+
 	SpawnDefaultController();
 	PathFindingCollision->SetRelativeScale3D(FVector(50.0f, 50.0f, 50.0f));
 
-	PathFindingCollision->OnComponentEndOverlap.AddDynamic(this, &AFollowingGasBase::OnEndOverlap);
-	PathFindingCollision->OnComponentBeginOverlap.AddDynamic(this, &AFollowingGasBase::OnBeginOverlap);
+	AddMovementInput(GetActorRotation().Vector().UpVector, -1.0f);
 }
 
 // Called every frame
@@ -49,12 +50,8 @@ void AFollowingGasBase::Tick(float DeltaTime)
 
 		UE_LOG(LogTemp, Warning, TEXT("Move"));
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Empty"));
-	}
 
-	GetCharacterMovement()->MaxFlySpeed = 750 + DeltaTime*3.0f;
+	GetCharacterMovement()->MaxFlySpeed = GetCharacterMovement()->MaxFlySpeed + (DeltaTime * 7.5f);
 }
 
 // Called to bind functionality to input

@@ -89,8 +89,10 @@ void AMainCharacter::Tick(float DeltaTime)
 
 	//MoveForward(1);
 
-	CharacterMaxWalkSpeed += DeltaTime*5;
-	CharacterMaxAimingWalkSpeed += DeltaTime*5;
+	CharacterCurrHP = FMath::Min(CharacterMaxHP, CharacterCurrHP + DeltaTime * 0.1f);
+
+	CharacterMaxWalkSpeed += DeltaTime*10;
+	CharacterMaxAimingWalkSpeed += DeltaTime*10;
 	GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxWalkSpeed;
 }
@@ -272,7 +274,7 @@ void AMainCharacter::SetPlayerRagdoll(const bool flag)
 	{
 		FAttachmentTransformRules ResetTransform = FAttachmentTransformRules::KeepRelativeTransform; 
 
-		GetCapsuleComponent()->SetWorldLocation(GetMesh()->GetComponentLocation(), false, nullptr, ETeleportType::TeleportPhysics);
+		GetCapsuleComponent()->SetWorldLocation(GetMesh()->GetComponentLocation()+FVector(0,0,100), false, nullptr, ETeleportType::TeleportPhysics);
 		GetMesh()->AttachToComponent(GetCapsuleComponent(), ResetTransform);
 		GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -68.0f), false, nullptr, ETeleportType::TeleportPhysics);
 		GetMesh()->SetRelativeRotation({ 0.0f, -90.0f, 0.0f });
