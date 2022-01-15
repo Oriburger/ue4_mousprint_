@@ -21,7 +21,7 @@ private:
 	bool bIsInGame = true; //= false;
 
 	float DisableRagdollDelay = 0;
-	float GettingUpTimeDelay = 0;
+	float GettingUpTimeDelay = 0; //플레이어가 넘어진 상태에서 다 일어나기까지 걸리는 시간
 	float CrouchingTime = 0; //슬라이딩 시간 
 
 public:
@@ -62,7 +62,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = Camera)
 		USpringArmComponent* CameraBoomAiming; //Aiming을 한 Zoom된 CameraBoom
 
-	UPROPERTY(BlueprintReadOnly, Category = Camera)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
 		UCameraComponent* FollowingCamera; //Following Camera
 
 	UPROPERTY(EditAnywhere, Category = AnimMontage)
@@ -93,6 +93,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		bool GetPlayerIsDead() const; 
+
+	UFUNCTION(BlueprintCallable)
+		bool GetPlayerIsGettingUp() const;
 
 	UFUNCTION(BlueprintCallable)
 		void MoveForward(float Value); 

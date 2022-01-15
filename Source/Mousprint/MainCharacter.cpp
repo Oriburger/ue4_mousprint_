@@ -128,6 +128,8 @@ bool AMainCharacter::GetPlayerIsAiming() const { return bIsAimed;  }
 
 bool AMainCharacter::GetPlayerIsDead() const { return bIsDead;  }
 
+bool AMainCharacter::GetPlayerIsGettingUp() const { GettingUpTimeDelay > 0; };
+
 void AMainCharacter::MoveForward(float Value)
 {
 	if (!GetWorld() || bIsDead || bIsRagdoll) return;
@@ -255,7 +257,7 @@ float AMainCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damage
 
 	//UE_LOG(LogTemp, Warning, TEXT("Take Damage"));
 
-	PlayAnimMontage(HitAnimMontage, 1.5f);
+	if(bIsInGame && !GetPlayerIsGettingUp() && !bIsDead) PlayAnimMontage(HitAnimMontage, 1.5f);
 
 	CharacterCurrHP = FMath::Max(0.0f, CharacterCurrHP-Damage);
 	if (CharacterCurrHP == 0) Die();
