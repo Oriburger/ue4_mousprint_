@@ -63,12 +63,9 @@ void AMainCharacter::Tick(float DeltaTime)
 
 	if (!bIsInGame) return;
 
-	//슬라이딩 자동 해제 로직
-	if (GetCharacterMovement()->IsCrouching())
-	{
-		CrouchingTime += DeltaTime;
-		if (CrouchingTime > 0.5f) StopSlide(); //슬라이딩 하는 시간은 0.5초
-	}
+	TryStopSlide(DeltaTime); //Slide 중이라면, 일정 시간 이후 자동으로 Slide를 멈춤
+	SpawnPathActor(DeltaTime); //일정 Tick 간격으로 PathActor를 스폰
+
 
 	//Ragdoll 관련 로직
 	if (DisableRagdollDelay > 0) //Ragdoll 상태가 되고, 다시 풀릴때까지의 딜레이
@@ -128,7 +125,7 @@ bool AMainCharacter::GetPlayerIsAiming() const { return bIsAimed;  }
 
 bool AMainCharacter::GetPlayerIsDead() const { return bIsDead;  }
 
-bool AMainCharacter::GetPlayerIsGettingUp() const { GettingUpTimeDelay > 0; };
+bool AMainCharacter::GetPlayerIsGettingUp() const { return GettingUpTimeDelay > 0; };
 
 void AMainCharacter::MoveForward(float Value)
 {
@@ -235,8 +232,17 @@ void AMainCharacter::StartSlide()
 	ACharacter::Crouch();
 }
 
-void AMainCharacter::StopSlide()
+void AMainCharacter::TryStopSlide(const float DeltaTime, const bool force)
 {
+	if (!force)
+	{
+		//슬라이딩 자동 해제 로직
+		if (!GetCharacterMovement()->IsCrouching()) return;
+
+		CrouchingTime += DeltaTime;
+		if (CrouchingTime < 0.5f) return;
+	}
+
 	//UE_LOG(LogTemp, Warning, TEXT("UnCrouch"));
 	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxAimingWalkSpeed;
 	ACharacter::UnCrouch();
@@ -246,7 +252,7 @@ void AMainCharacter::StopSlide()
 void AMainCharacter::StartJump()
 {
 	if (GetCharacterMovement()->IsFalling() || bIsDead) return;
-	StopSlide();
+	TryStopSlide(0, true);
 	ACharacter::Jump();
 }
 
@@ -293,6 +299,21 @@ void AMainCharacter::SetPlayerRagdoll(const bool flag)
 	}
 }
 
+bool AMainCharacter::SpawnPathActor(const float DeltaTime)
+{
+	if (PathClass == nullptr) return false;
+	if (bIsDead || !bIsInGame) return false;
+
+	PathSpawnTime += DeltaTime;
+	if (PathSpawnTime > 0.25f)
+	{
+		GetWorld()->SpawnActor<AActor>(PathClass, GetActorLocation(), GetActorRotation());
+		PathSpawnTime = 0;
+	}
+
+	return true;
+}
+
 void AMainCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor
 	, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -303,10 +324,5 @@ void AMainCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor
 		SetPlayerRagdoll(true);
 		bIsRagdoll = true;
 		DisableRagdollDelay = 1.5f;
-	}
-
-	else if (OtherActor->ActorHasTag("Mob") && Cast<AMobBase>(OtherActor)->GetIsExploding())
-	{
-		
 	}
 }

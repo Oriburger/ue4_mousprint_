@@ -5,6 +5,7 @@
 #include "EngineMinimal.h"
 #include "Weapon.h"
 #include "Bullet.h"
+#include "PathBase.h"
 #include "Sound/SoundWave.h"
 #include "GameFramework/Character.h"
 #include "MainCharacter.generated.h"
@@ -20,7 +21,8 @@ private:
 	bool bIsAimed = false;
 	bool bIsInGame = true; //= false;
 
-	float DisableRagdollDelay = 0;
+	float PathSpawnTime = 0;
+	float DisableRagdollDelay = 0; //Ragdoll 상태에서 다시 풀릴때까지 걸리는 시간
 	float GettingUpTimeDelay = 0; //플레이어가 넘어진 상태에서 다 일어나기까지 걸리는 시간
 	float CrouchingTime = 0; //슬라이딩 시간 
 
@@ -74,8 +76,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = AnimMontage)
 		UAnimMontage* HitAnimMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
+	UPROPERTY(EditAnywhere, Category = Gameplay)
 		TSubclassOf<class ABullet> ProjectileClass; //무기에 딸려있는 Projectile Class -> Weapon 클래스로 옮겨질 예정
+
+	UPROPERTY(EditAnywhere, Category = Gameplay)
+		TSubclassOf<class APathBase> PathClass;
 
 protected:
 	// Called when the game starts or when spawned
@@ -116,7 +121,7 @@ public:
 		void StartSlide();
 
 	UFUNCTION()
-		void StopSlide();
+		void TryStopSlide(const float DeltaTime, const bool force = false);
 
 	UFUNCTION()
 		void StartJump();
@@ -130,6 +135,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void SetPlayerRagdoll(const bool flag);
+
+	UFUNCTION()
+		bool SpawnPathActor(const float DeltaTime);
 
 	UFUNCTION()
 		void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp
