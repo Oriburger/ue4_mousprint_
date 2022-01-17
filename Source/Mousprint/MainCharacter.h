@@ -37,6 +37,7 @@ public:
 	// Sets default values for this character's properties
 	AMainCharacter();
 
+	/* ----- Charater State ----- */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
 		float CharacterMaxHP = 100;
 
@@ -55,6 +56,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
 		float CharacterMaxAimingWalkSpeed = 750;
 
+	/* ----- Basic Component ----- */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 		UChildActorComponent* Weapon; //무기 메시
 
@@ -67,6 +69,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
 		UCameraComponent* FollowingCamera; //Following Camera
 
+	/* ------ Anim Montages ------ */
 	UPROPERTY(EditAnywhere, Category = AnimMontage)
 		UAnimMontage* FireAnimMontage;
 
@@ -76,6 +79,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = AnimMontage)
 		UAnimMontage* HitAnimMontage;
 
+	UPROPERTY(EditAnywhere, Category = AnimMontage)
+		UAnimMontage* RushAnimMontage;
+
+	/* ----- Spawn Class ----- */
 	UPROPERTY(EditAnywhere, Category = Gameplay)
 		TSubclassOf<class ABullet> ProjectileClass; //무기에 딸려있는 Projectile Class -> Weapon 클래스로 옮겨질 예정
 
@@ -93,6 +100,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	/* ---플레이어의 상태---- */
 	UFUNCTION(BlueprintCallable)
 		bool GetPlayerIsAiming() const; //플레이어가 Aiming 중인지 반환
 
@@ -102,6 +110,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		bool GetPlayerIsGettingUp() const;
 
+	/* --- Axis & Action Input --- */
 	UFUNCTION(BlueprintCallable)
 		void MoveForward(float Value); 
 
@@ -124,8 +133,12 @@ public:
 		void TryStopSlide(const float DeltaTime, const bool force = false);
 
 	UFUNCTION()
+		void StartRush();
+
+	UFUNCTION()
 		void StartJump();
 
+	/* --- Etc ---- */
 	UFUNCTION()
 		virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent
 							, AController* EventInstigator, AActor * DamageCauser) override;

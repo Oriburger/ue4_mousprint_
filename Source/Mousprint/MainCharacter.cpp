@@ -116,7 +116,7 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AMainCharacter::StopAim);
 
 	PlayerInputComponent->BindAction("Slide", IE_Pressed, this, &AMainCharacter::StartSlide);
-	//PlayerInputComponent->BindAction("Slide", IE_Released, this, &AMainCharacter::StopSlide);
+	PlayerInputComponent->BindAction("Rush", IE_Pressed, this, &AMainCharacter::StartRush);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AMainCharacter::StartJump);
 }
@@ -249,9 +249,26 @@ void AMainCharacter::TryStopSlide(const float DeltaTime, const bool force)
 	CrouchingTime = 0;
 }
 
+void AMainCharacter::StartRush()
+{
+	if (bIsDead || bIsAimed || bIsRagdoll || !bIsInGame || GetPlayerIsGettingUp()) return;	
+	if (GetCharacterMovement()->IsFalling()) return;
+
+	GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
+	LaunchCharacter({ 0.0f, 0.0f, 350.0f }, false, true);
+	if (RushAnimMontage != nullptr)	PlayAnimMontage(RushAnimMontage);
+
+	FTimerHandle WaitHandle;
+	float WaitTime = 0.2f;
+	GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
+		{ LaunchCharacter(GetVelocity() * 1.25f, true, false); }), WaitTime, false); 
+	
+	GetCharacterMovement()->DefaultLandMovementMode = MOVE_Walking;
+}
+
 void AMainCharacter::StartJump()
 {
-	if (GetCharacterMovement()->IsFalling() || bIsDead) return;
+	if (GetCharacterMovement()->IsFalling() || bIsDead || GetPlayerIsGettingUp()) return;
 	TryStopSlide(0, true);
 	ACharacter::Jump();
 }
