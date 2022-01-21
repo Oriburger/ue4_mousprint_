@@ -17,13 +17,13 @@ class MOUSPRINT_API ATileGenerator : public AActor
 private:
 	TArray<ATileBasic*> SpawnedTileArr; //스폰된 타일의 주소를 저장하는 배열
 	bool prevCurveTileType = 0; //0 왼쪽 1 오른쪽
+	bool prevTileType; //0 직선, 1 커브
+	int32 prevTileIdx = 0; 
+	bool bIsSpawningTile = false; //타일이 겹치게 스폰되는 것을 방지하는 변수
 
 public:	
 	// Sets default values for this actor's properties
 	ATileGenerator();
-
-	UPROPERTY(VisibleDefaultsOnly)
-		bool bIsSpawningTile = false; //타일이 겹치게 스폰되는 것을 방지하는 변수
 
 	UPROPERTY(EditAnywhere, Category = SpawnInfo)
 		int32 MaxSpawnTileCnt = 5; //맵에 스폰될 최대 타일 개수, SpawnedTileArr의 최대 크기

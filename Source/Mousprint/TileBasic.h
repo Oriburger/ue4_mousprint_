@@ -14,16 +14,25 @@ class MOUSPRINT_API ATileBasic : public AActor
 	GENERATED_BODY()
 
 private:
+	TArray<AActor*> SpawnedObstacleArr; //스폰된 장애물의 주소를 저장하는 배열
+
 	bool OverlapFlag = false; //플레이어가 BoxTrigger에 Overlapped 되었는가?
-	static const int32 MaxObstacleCount = 16;
-	//static int SpawnedTileCnt = 0;
+	static const int32 MaxObstacleCount = 16; 
+	int SpawnedObstacleCnt = 0; //현재까지 스폰된 장애물의 수
+	float SpawnPercentage = 100.0f;
 
 public:	
 	// Sets default values for this actor's properties
 	ATileBasic();
 
-	UPROPERTY(EditAnywhere)
-		int32 UseObstacleCount = 10;
+	UPROPERTY(EditAnywhere, Category = Obstacle)
+		int32 UseObstacleCount = 10;  //배치되어있는 장애물 스폰 볼륨의 수
+
+	UPROPERTY(EditAnywhere, Category = Obstacle)
+		int32 MaxSpawnObstacleCount = 10; //배치된 스폰 볼륨 중에서 실제로 스폰할 장애물의 수 
+
+	UPROPERTY(EditAnywhere, Category = Obstacle)
+		float ObstacleSpawnPercentage = 100.0f;
 
 	UPROPERTY(VisibleDefaultsOnly)
 		USceneComponent* DefaultSceneRoot;
@@ -43,6 +52,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
 	// Called every frame

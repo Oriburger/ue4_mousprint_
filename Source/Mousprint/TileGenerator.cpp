@@ -28,10 +28,19 @@ void ATileGenerator::Tick(float DeltaTime)
 	if (SpawnedTileArr.Num() <= MaxSpawnTileCnt && !bIsSpawningTile)
 	{
 		bIsSpawningTile = true; //중복 스폰 방지
-		bool bIsCurve = FMath::RandBool();
-		if(bIsCurve) SpawnedTileArr.Push(SpawnTile(false, FMath::RandRange(1, CurveTileClassArray.Num() - 1), bIsCurve)); //Spawn 된 타일을 Arr에 넣음
-		else SpawnedTileArr.Push(SpawnTile(false, FMath::RandRange(1, StraightTileClassArray.Num() - 1), bIsCurve));
-		 
+		bool bIsCurve = (FMath::RandRange(0, 100) > 90.0f);
+		int32 nextTileIdx = -1;  
+		ATileBasic* SpawnedTile = nullptr;
+
+		if (bIsCurve) nextTileIdx = FMath::RandRange(1, CurveTileClassArray.Num() - 1);
+		else nextTileIdx = FMath::RandRange(1, StraightTileClassArray.Num() - 1);
+	
+		if(nextTileIdx != prevTileIdx || bIsCurve != prevTileType)
+			SpawnedTile = SpawnTile(false, nextTileIdx, bIsCurve); 
+		
+		if(SpawnedTile != nullptr)
+			SpawnedTileArr.Push(SpawnedTile);//Spawn 된 타일을 Arr에 넣음
+		
 		bIsSpawningTile = false;
 	}
 	if (SpawnedTileArr.IsValidIndex(10) //플레이어가 2번째 타일의 오버랩 볼륨에 닿았다면
@@ -61,6 +70,8 @@ ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, int TileIdx, bool bIs
 	TSubclassOf<class ATileBasic>& SpawnTarget = (bIsCurve ? CurveTileClassArray[TileIdx] : StraightTileClassArray[TileIdx]);
 	if (SpawnTarget == nullptr) return nullptr;
 
+	prevTileType = bIsCurve;
+	prevTileIdx = TileIdx;
 
 	//UE_LOG(LogTemp, Warning, TEXT("Tile Spawned")); //디버그 Log
 

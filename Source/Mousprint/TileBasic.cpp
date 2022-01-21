@@ -18,7 +18,7 @@ ATileBasic::ATileBasic()
 
 	EdgeArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("EDGE_ARROW"));
 	EdgeArrowComponent->SetupAttachment(RootComponent);
-	EdgeArrowComponent->SetRelativeLocationAndRotation(FVector(6000.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
+	EdgeArrowComponent->SetRelativeLocationAndRotation(FVector(1000.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
 	EdgeArrowComponent->ArrowSize = 2.0f;
 
 	BoxTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BOX_TRIGGER"));
@@ -49,6 +49,18 @@ void ATileBasic::BeginPlay()
 	}
 }
 
+void ATileBasic::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	//스폰한 장애물들을 전부 반환
+	for (auto& Obstacle : SpawnedObstacleArr)
+	{
+		if(Obstacle != nullptr)
+			Obstacle->Destroy();
+	}
+}
+
 // Called every frame
 void ATileBasic::Tick(float DeltaTime)
 {
@@ -68,13 +80,21 @@ bool ATileBasic::InitObstacle()
 
 	//SpawnParams.Instigator = this;
 
-	for (int i = 0; i < UseObstacleCount; i++)
+	for(int i = FMath::RandRange(0, UseObstacleCount - 1); ;)
 	{
-		const auto target = ObstacleSpawnPointArray[i];
-		if (FMath::RandRange(1, 100) > 20)
-			GetWorld()->SpawnActor<AActor>(ObstacleClass, target->GetComponentLocation(), target->GetComponentRotation());
-	}
+		if (SpawnedObstacleCnt >= MaxSpawnObstacleCount) break;
+		if (SpawnedObstacleCnt >= UseObstacleCount) break;
 
+		const auto target = ObstacleSpawnPointArray[i];
+		if (FMath::RandRange(1, 100) > 100.0f - ObstacleSpawnPercentage)
+		{
+			AActor* SpawnedObstacle = GetWorld()->SpawnActor<AActor>(ObstacleClass, target->GetComponentLocation(), target->GetComponentRotation());
+			if (SpawnedObstacle == nullptr) continue;
+			SpawnedObstacleArr.Push(SpawnedObstacle);
+			SpawnedObstacleCnt++;
+		}
+		i = ((i + 1) % UseObstacleCount);
+	}
 	return true;
 }
 
@@ -89,3 +109,4 @@ void ATileBasic::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 	if (!OtherActor->ActorHasTag(TEXT("Player"))) return; //오버랩된 액터가 플레이어가 아니면 return;
 	OverlapFlag = true;
 }
+
