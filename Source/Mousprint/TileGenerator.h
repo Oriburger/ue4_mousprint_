@@ -24,6 +24,9 @@ private:
 public:	
 	// Sets default values for this actor's properties
 	ATileGenerator();
+	
+	UPROPERTY(EditAnywhere, Category = SpawnInfo)
+		float CurveTileSpawnPercentage = 10.0f;
 
 	UPROPERTY(EditAnywhere, Category = SpawnInfo)
 		int32 MaxSpawnTileCnt = 5; //맵에 스폰될 최대 타일 개수, SpawnedTileArr의 최대 크기
@@ -49,6 +52,6 @@ public:
 		ATileBasic* SpawnTile(const bool _bIsInit, int TileIdx, bool bIsCurve); //타일을 스폰
 																 //_bIsInit : 최초 스폰 시 true로 전달 
 																 //TileIdx : 스폰할 타일 클래스의 idx를 전달
-		UFUNCTION()
+	UFUNCTION()
 		void DestroyTile(ATileBasic* target); //Target 타일을 제거
 };

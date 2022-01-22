@@ -28,7 +28,7 @@ void ATileGenerator::Tick(float DeltaTime)
 	if (SpawnedTileArr.Num() <= MaxSpawnTileCnt && !bIsSpawningTile)
 	{
 		bIsSpawningTile = true; //중복 스폰 방지
-		bool bIsCurve = (FMath::RandRange(0, 100) > 90.0f);
+		bool bIsCurve = (FMath::RandRange(0, 100) < CurveTileSpawnPercentage);
 		int32 nextTileIdx = -1;  
 		ATileBasic* SpawnedTile = nullptr;
 
@@ -46,7 +46,8 @@ void ATileGenerator::Tick(float DeltaTime)
 	if (SpawnedTileArr.IsValidIndex(10) //플레이어가 2번째 타일의 오버랩 볼륨에 닿았다면
 		&& SpawnedTileArr[10]->IsOverlapped())
 	{
-		DestroyTile(SpawnedTileArr[0]); //0번째 타일을 Destroy
+		//SpawnedTileArr[0]->DestroyObstacle(); //0번째 타일을 Destroy
+		SpawnedTileArr[0]->Destroy();
 		SpawnedTileArr.RemoveAt(0); //배열로부터 제거
 	}
 }

@@ -224,8 +224,9 @@ void AMainCharacter::StopAim()
 
 void AMainCharacter::StartSlide()
 {
-	if (GetCharacterMovement()->IsFalling() || bIsDead || bIsRagdoll) return;
-	if (GetCharacterMovement()->IsCrouching()) return;
+	if (GetCharacterMovement()->IsCrouching() || bIsDead || bIsRagdoll) return;
+
+	StopJump();
 
 	//UE_LOG(LogTemp, Warning, TEXT("Crouch"));
 	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxWalkSpeed;
@@ -271,6 +272,14 @@ void AMainCharacter::StartJump()
 	if (GetCharacterMovement()->IsFalling() || bIsDead || GetPlayerIsGettingUp()) return;
 	TryStopSlide(0, true);
 	ACharacter::Jump();
+}
+
+void AMainCharacter::StopJump()
+{
+	if (!GetCharacterMovement()->IsFalling()) return;
+
+	StopJumping();
+	LaunchCharacter({ 0.0f, 0.0f, -500.0f }, false, true);
 }
 
 float AMainCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent

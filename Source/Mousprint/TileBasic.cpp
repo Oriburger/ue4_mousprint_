@@ -49,18 +49,6 @@ void ATileBasic::BeginPlay()
 	}
 }
 
-void ATileBasic::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-
-	//스폰한 장애물들을 전부 반환
-	for (auto& Obstacle : SpawnedObstacleArr)
-	{
-		if(Obstacle != nullptr)
-			Obstacle->Destroy();
-	}
-}
-
 // Called every frame
 void ATileBasic::Tick(float DeltaTime)
 {
@@ -110,3 +98,14 @@ void ATileBasic::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 	OverlapFlag = true;
 }
 
+void ATileBasic::DestroyObstacle()
+{
+	//스폰한 장애물들을 전부 반환
+	if (SpawnedObstacleArr.Num() == 0) return;
+
+	for(int idx=SpawnedObstacleArr.Num()-1; idx>=0; idx--)
+	{
+		if (SpawnedObstacleArr[idx] != nullptr) SpawnedObstacleArr[idx]->Destroy();
+		if (SpawnedObstacleArr.IsValidIndex(idx)) SpawnedObstacleArr.RemoveAt(idx);
+	}
+}

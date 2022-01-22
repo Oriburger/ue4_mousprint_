@@ -126,7 +126,7 @@ public:
 	UFUNCTION()
 		void StopAim();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void StartSlide();
 
 	UFUNCTION()
@@ -137,6 +137,9 @@ public:
 
 	UFUNCTION()
 		void StartJump();
+
+	UFUNCTION()
+		void StopJump();
 
 	/* --- Etc ---- */
 	UFUNCTION()

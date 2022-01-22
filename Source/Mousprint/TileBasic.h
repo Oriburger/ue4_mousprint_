@@ -52,7 +52,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
 	// Called every frame
@@ -63,6 +62,9 @@ public:
 	
 	UFUNCTION()
 		bool InitObstacle();
+
+	UFUNCTION()
+		void DestroyObstacle();
 
 	UFUNCTION()
 		bool IsOverlapped() const; //플레이어가 BoxTrigger에 Overlapped 되었는가?
