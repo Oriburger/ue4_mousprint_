@@ -41,7 +41,7 @@ void AMobBase::BeginPlay()
 	EnemyDetectVolume->OnComponentBeginOverlap.AddDynamic(this, &AMobBase::OnBeginDetect); 
 	AtkRangeVolume->OnComponentBeginOverlap.AddDynamic(this, &AMobBase::OnOverlapAtkRange);
 
-	if(bHasExplodeEffect) GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Emmisive"), 100.0f);
+	if(bHasExplodeEffect) GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Emmisive"), 0.0f);
 	if(bHasDyingEffect) GetMesh()->SetScalarParameterValueOnMaterials(TEXT("Opacity"), 2.0f);
 }
 
