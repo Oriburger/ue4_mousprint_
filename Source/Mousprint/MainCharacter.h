@@ -45,19 +45,13 @@ public:
 		float CharacterCurrHP = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
-		float CharacterMinWalkSpeed = 1000;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
-		float CharacterMinAimingWalkSpeed = 750;
+		float CharacterMinWalkSpeed = 1000; //플레이어의 최소 이동 속도 제한 (이 값 이상으로 줄어들지 않음)
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
 		float CharacterMaxWalkSpeed = 1400; //플레이어의 최대 이동 속도 제한 (이 값 이상으로 늘어나지 않음)
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
 		float CharacterWalkSpeed = 1000; //플레이어의 이동 속도
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
-		float CharacterAimingWalkSpeed = 750; 
 
 	/* ----- Basic Component ----- */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
@@ -148,6 +142,9 @@ public:
 	UFUNCTION()
 		virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent
 							, AController* EventInstigator, AActor * DamageCauser) override;
+
+	UFUNCTION(BlueprintCallable)
+		bool SetWalkSpeedLimit(const float MinValue, const float MaxValue);
 
 	UFUNCTION(BlueprintCallable)
 		void Die();

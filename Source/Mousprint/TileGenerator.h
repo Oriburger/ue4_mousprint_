@@ -16,10 +16,15 @@ class MOUSPRINT_API ATileGenerator : public AActor
 
 private:
 	TArray<ATileBasic*> SpawnedTileArr; //스폰된 타일의 주소를 저장하는 배열
+	int32 SpawnTileMinIdx = 0; //스폰할 타일 액터의 시작 Idx
+	int32 SpawnTileMaxIdx = 0; //스폰할 타일 액터의 끝 Idx
+		
 	bool prevCurveTileType = 0; //0 왼쪽 1 오른쪽
-	bool prevTileType; //0 직선, 1 커브
-	int32 prevTileIdx = 0; 
+	bool prevTileType; //이전에 스폰된 타일 유형 - 0 직선, 1 커브
+	int32 prevTileIdx = 0; //이전에 스폰된 타일의 Idx
+
 	bool bIsSpawningTile = false; //타일이 겹치게 스폰되는 것을 방지하는 변수
+
 
 public:	
 	// Sets default values for this actor's properties
@@ -40,9 +45,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SpawnInfo)
 		TArray<TSubclassOf<class ATileBasic> > BeginTileClassArray;
 
-	UPROPERTY(EditAnywhere)
-		class UDataTable* SpawnInfoTable;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -58,6 +60,9 @@ public:
 		ATileBasic* SpawnTile(const bool _bIsInit, int TileIdx, bool bIsCurve); //타일을 스폰
 																 //_bIsInit : 최초 스폰 시 true로 전달 
 																 //TileIdx : 스폰할 타일 클래스의 idx를 전달
+	UFUNCTION(BlueprintCallable)
+		bool SetSpawnTileIdxRange(const int32 start, const int32 finish);
+
 	UFUNCTION()
 		void DestroyTile(ATileBasic* target); //Target 타일을 제거
 };

@@ -16,7 +16,7 @@ ATileGenerator::ATileGenerator()
 void ATileGenerator::BeginPlay()
 {
 	Super::BeginPlay();
-	SpawnedTileArr.Push(SpawnTile(true, 0, false)); //게임 시작 시 하나는 스폰
+	SpawnedTileArr.Push(SpawnTile(true, SpawnTileMinIdx, false)); //게임 시작 시 하나는 스폰
 }
 
 // Called every frame
@@ -32,8 +32,8 @@ void ATileGenerator::Tick(float DeltaTime)
 		int32 nextTileIdx = -1;  
 		ATileBasic* SpawnedTile = nullptr;
 
-		if (bIsCurve) nextTileIdx = FMath::RandRange(1, CurveTileClassArray.Num() - 1);
-		else nextTileIdx = FMath::RandRange(1, StraightTileClassArray.Num() - 1);
+		if (bIsCurve) nextTileIdx = FMath::RandRange(SpawnTileMinIdx, SpawnTileMaxIdx);
+		else nextTileIdx = FMath::RandRange(SpawnTileMinIdx+1, SpawnTileMaxIdx); //맨 시작 타일은 제외
 	
 		if(nextTileIdx != prevTileIdx || bIsCurve != prevTileType)
 			SpawnedTile = SpawnTile(false, nextTileIdx, bIsCurve); 
@@ -95,6 +95,14 @@ ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, int TileIdx, bool bIs
 	ATileBasic* NewTile = GetWorld()->SpawnActor<ATileBasic>(SpawnTarget, BeginLocation, BeginRotation);
 	
 	return NewTile;
+}
+
+bool ATileGenerator::SetSpawnTileIdxRange(const int32 start, const int32 finish)
+{
+	if (start > finish) return false;
+	SpawnTileMinIdx = start;
+	SpawnTileMaxIdx = finish;
+	return true;
 }
 
 void ATileGenerator::DestroyTile(ATileBasic * target)

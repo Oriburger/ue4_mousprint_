@@ -37,8 +37,8 @@ AMainCharacter::AMainCharacter()
 
 	FollowingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FOLLOWING_CAMERA"));
 	FollowingCamera->SetupAttachment(CameraBoomNormal);
-	GetCharacterMovement()->MaxWalkSpeed = CharacterAimingWalkSpeed;
-	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterMinWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMinWalkSpeed * 0.75;
 	GetCharacterMovement()->JumpZVelocity = 350;
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	//this->bUseControllerRotationYaw = false;
@@ -78,21 +78,18 @@ void AMainCharacter::Tick(float DeltaTime)
 		{
 			bIsRagdoll = false;
 			CharacterWalkSpeed = FMath::Max(CharacterMinWalkSpeed, CharacterWalkSpeed * 90 / 100);
-			CharacterAimingWalkSpeed = FMath::Max(CharacterMinAimingWalkSpeed, CharacterAimingWalkSpeed * 90 / 100);
 		}
 	}
 
 	//MoveForward(1);
 
 	CharacterCurrHP = FMath::Min(CharacterMaxHP, CharacterCurrHP + DeltaTime);
-
-	CharacterWalkSpeed += DeltaTime * 10.0f;
-	CharacterAimingWalkSpeed += DeltaTime * 10.0f;
+	CharacterWalkSpeed = FMath::Min(CharacterMaxWalkSpeed, CharacterWalkSpeed + DeltaTime * 10.0f);
 
 	if (!GetPlayerIsAiming() && !GetCharacterMovement()->IsCrouching())
 	{
-		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterAimingWalkSpeed;
 		GetCharacterMovement()->MaxWalkSpeed = CharacterWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterWalkSpeed * 0.75;
 	}
 }
 
@@ -197,7 +194,7 @@ void AMainCharacter::Aim()
 	//UE_LOG(LogTemp, Warning, TEXT("Aim"));
 
 	bIsAimed = true;
-	GetCharacterMovement()->MaxWalkSpeed = CharacterAimingWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterWalkSpeed * 0.75;
 
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;
@@ -227,7 +224,6 @@ void AMainCharacter::StartSlide()
 	StopJump();
 
 	//UE_LOG(LogTemp, Warning, TEXT("Crouch"));
-	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxWalkSpeed;
 	ACharacter::Crouch();
 }
 
@@ -242,7 +238,6 @@ void AMainCharacter::TryStopSlide(const float DeltaTime, const bool force)
 		if (CrouchingTime < 0.5f) return;
 	}
 	//UE_LOG(LogTemp, Warning, TEXT("UnCrouch"));
-	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterAimingWalkSpeed;
 	ACharacter::UnCrouch();
 	CrouchingTime = 0;
 }
@@ -292,6 +287,14 @@ float AMainCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damage
 	if (CharacterCurrHP == 0) Die();
 
 	return FinalDamage;
+}
+
+bool AMainCharacter::SetWalkSpeedLimit(const float MinValue, const float MaxValue)
+{
+	if (MinValue > MaxValue) return false;
+	CharacterMaxWalkSpeed = MaxValue;
+	CharacterMinWalkSpeed = MinValue;
+	return true;
 }
 
 void AMainCharacter::Die()
