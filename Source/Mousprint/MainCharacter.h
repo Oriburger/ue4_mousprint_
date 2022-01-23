@@ -21,7 +21,7 @@ private:
 	bool bIsAimed = false;
 	bool bIsInGame = true; //= false;
 
-	float PathSpawnTime = 0;
+	float PathSpawnTime = 0; //PathActor 스폰위한 DeltaTime 계산 값 
 	float DisableRagdollDelay = 0; //Ragdoll 상태에서 다시 풀릴때까지 걸리는 시간
 	float GettingUpTimeDelay = 0; //플레이어가 넘어진 상태에서 다 일어나기까지 걸리는 시간
 	float CrouchingTime = 0; //슬라이딩 시간 
@@ -51,10 +51,13 @@ public:
 		float CharacterMinAimingWalkSpeed = 750;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
-		float CharacterMaxWalkSpeed = 1000;
+		float CharacterMaxWalkSpeed = 1400; //플레이어의 최대 이동 속도 제한 (이 값 이상으로 늘어나지 않음)
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
-		float CharacterMaxAimingWalkSpeed = 750;
+		float CharacterWalkSpeed = 1000; //플레이어의 이동 속도
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
+		float CharacterAimingWalkSpeed = 750; 
 
 	/* ----- Basic Component ----- */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)

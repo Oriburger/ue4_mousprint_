@@ -1,6 +1,6 @@
-Stage,MinTileIdxCurve,MaxTileIdxCurve,MinTileIdxStraight,MinTileIdxStraight,MinPlayerSpeed,MaxPlayerSpeed
-1,0,2,1,4,,
-2,,,,,,
-3,,,,,,
-4,,,,,,
-5,,,,,,
+Name,Stage,StartTime,MinTileIdx,MaxTileIdx,MinPlayerSpeed,MaxPlayerSpeed
+0,1,0,0,5,1000,1600
+1,2,60,6,11,1200,1800
+2,3,120,12,17,1400,2000
+3,4,180,18,23,1600,2200
+4,5,240,24,29,1800,2400

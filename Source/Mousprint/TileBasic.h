@@ -19,20 +19,23 @@ private:
 	bool OverlapFlag = false; //플레이어가 BoxTrigger에 Overlapped 되었는가?
 	static const int32 MaxObstacleCount = 16; 
 	int SpawnedObstacleCnt = 0; //현재까지 스폰된 장애물의 수
-	float SpawnPercentage = 100.0f;
+	int32 TileIdx = -1; //타일의 Idx 정보
 
 public:	
 	// Sets default values for this actor's properties
 	ATileBasic();
 
-	UPROPERTY(EditAnywhere, Category = Obstacle)
+	UPROPERTY(EditAnywhere, Category = Gameplay)
 		int32 UseObstacleCount = 10;  //배치되어있는 장애물 스폰 볼륨의 수
 
-	UPROPERTY(EditAnywhere, Category = Obstacle)
+	UPROPERTY(EditAnywhere, Category = Gameplay)
 		int32 MaxSpawnObstacleCount = 10; //배치된 스폰 볼륨 중에서 실제로 스폰할 장애물의 수 
 
-	UPROPERTY(EditAnywhere, Category = Obstacle)
+	UPROPERTY(EditAnywhere, Category = Gameplay)
 		float ObstacleSpawnPercentage = 100.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float TileSpawnPercentage = 100.0f;
 
 	UPROPERTY(VisibleDefaultsOnly)
 		USceneComponent* DefaultSceneRoot;
@@ -68,6 +71,9 @@ public:
 
 	UFUNCTION()
 		bool IsOverlapped() const; //플레이어가 BoxTrigger에 Overlapped 되었는가?
+
+	UFUNCTION()
+		int32 GetTileIdx() const;
 
 	UFUNCTION()
 		void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor

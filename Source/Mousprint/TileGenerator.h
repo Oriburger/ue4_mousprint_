@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "EngineMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TileBasic.h"
 #include "Containers/Array.h"
@@ -36,6 +36,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SpawnInfo)
 		TArray<TSubclassOf<class ATileBasic> > StraightTileClassArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = SpawnInfo)
+		TArray<TSubclassOf<class ATileBasic> > BeginTileClassArray;
+
+	UPROPERTY(EditAnywhere)
+		class UDataTable* SpawnInfoTable;
 
 protected:
 	// Called when the game starts or when spawned

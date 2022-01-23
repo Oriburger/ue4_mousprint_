@@ -46,8 +46,12 @@ void ATileGenerator::Tick(float DeltaTime)
 	if (SpawnedTileArr.IsValidIndex(10) //플레이어가 2번째 타일의 오버랩 볼륨에 닿았다면
 		&& SpawnedTileArr[10]->IsOverlapped())
 	{
-		//SpawnedTileArr[0]->DestroyObstacle(); //0번째 타일을 Destroy
-		SpawnedTileArr[0]->Destroy();
+		ATileBasic* DestoyTarget = SpawnedTileArr[0];
+		if (DestoyTarget != nullptr && IsValid(DestoyTarget))
+		{
+			DestoyTarget->DestroyObstacle(); //0번째 타일을 Destroy
+			DestoyTarget->Destroy();
+		}
 		SpawnedTileArr.RemoveAt(0); //배열로부터 제거
 	}
 }
@@ -62,11 +66,13 @@ ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, int TileIdx, bool bIs
 {
 	if (!GetWorld()) return nullptr; //Idx 정보가 Invalid 라면 nullptr 반환
 	if (bIsCurve)
-	{
+	{	
+		if (!CurveTileClassArray.IsValidIndex(TileIdx)) return nullptr;
 		if (prevCurveTileType && TileIdx % 2 == 1) TileIdx -= 1;
 		else if (!prevCurveTileType && TileIdx % 2 == 0) TileIdx += 1;
 		prevCurveTileType = (TileIdx % 2 == 1);
 	}
+	else if (!StraightTileClassArray.IsValidIndex(TileIdx)) return nullptr;
 
 	TSubclassOf<class ATileBasic>& SpawnTarget = (bIsCurve ? CurveTileClassArray[TileIdx] : StraightTileClassArray[TileIdx]);
 	if (SpawnTarget == nullptr) return nullptr;

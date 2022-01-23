@@ -37,8 +37,8 @@ AMainCharacter::AMainCharacter()
 
 	FollowingCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FOLLOWING_CAMERA"));
 	FollowingCamera->SetupAttachment(CameraBoomNormal);
-	GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
-	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterAimingWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterWalkSpeed;
 	GetCharacterMovement()->JumpZVelocity = 350;
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	//this->bUseControllerRotationYaw = false;
@@ -53,7 +53,6 @@ void AMainCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AMainCharacter::OnHit); //Hit 이벤트 추가
-	
 }
 
 // Called every frame
@@ -65,7 +64,6 @@ void AMainCharacter::Tick(float DeltaTime)
 
 	TryStopSlide(DeltaTime); //Slide 중이라면, 일정 시간 이후 자동으로 Slide를 멈춤
 	SpawnPathActor(DeltaTime); //일정 Tick 간격으로 PathActor를 스폰
-
 
 	//Ragdoll 관련 로직
 	if (DisableRagdollDelay > 0) //Ragdoll 상태가 되고, 다시 풀릴때까지의 딜레이
@@ -79,8 +77,8 @@ void AMainCharacter::Tick(float DeltaTime)
 		if (GettingUpTimeDelay == 0)
 		{
 			bIsRagdoll = false;
-			CharacterMaxWalkSpeed = FMath::Max(CharacterMinWalkSpeed, CharacterMaxWalkSpeed * 90 / 100);
-			CharacterMaxAimingWalkSpeed = FMath::Max(CharacterMinAimingWalkSpeed, CharacterMaxAimingWalkSpeed * 90 / 100);
+			CharacterWalkSpeed = FMath::Max(CharacterMinWalkSpeed, CharacterWalkSpeed * 90 / 100);
+			CharacterAimingWalkSpeed = FMath::Max(CharacterMinAimingWalkSpeed, CharacterAimingWalkSpeed * 90 / 100);
 		}
 	}
 
@@ -88,13 +86,13 @@ void AMainCharacter::Tick(float DeltaTime)
 
 	CharacterCurrHP = FMath::Min(CharacterMaxHP, CharacterCurrHP + DeltaTime);
 
-	CharacterMaxWalkSpeed += DeltaTime * 10.0f;
-	CharacterMaxAimingWalkSpeed += DeltaTime * 10.0f;
+	CharacterWalkSpeed += DeltaTime * 10.0f;
+	CharacterAimingWalkSpeed += DeltaTime * 10.0f;
 
 	if (!GetPlayerIsAiming() && !GetCharacterMovement()->IsCrouching())
 	{
-		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxAimingWalkSpeed;
-		GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterAimingWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = CharacterWalkSpeed;
 	}
 }
 
@@ -199,7 +197,7 @@ void AMainCharacter::Aim()
 	//UE_LOG(LogTemp, Warning, TEXT("Aim"));
 
 	bIsAimed = true;
-	GetCharacterMovement()->MaxWalkSpeed = CharacterMaxAimingWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterAimingWalkSpeed;
 
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;
@@ -213,7 +211,7 @@ void AMainCharacter::StopAim()
 	//UE_LOG(LogTemp, Warning, TEXT("AimStop"));
 
 	bIsAimed = false;
-	GetCharacterMovement()->MaxWalkSpeed = CharacterMaxWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterWalkSpeed;
 
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;
@@ -243,9 +241,8 @@ void AMainCharacter::TryStopSlide(const float DeltaTime, const bool force)
 		CrouchingTime += DeltaTime;
 		if (CrouchingTime < 0.5f) return;
 	}
-
 	//UE_LOG(LogTemp, Warning, TEXT("UnCrouch"));
-	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterMaxAimingWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterAimingWalkSpeed;
 	ACharacter::UnCrouch();
 	CrouchingTime = 0;
 }

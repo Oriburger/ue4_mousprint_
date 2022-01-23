@@ -86,10 +86,9 @@ bool ATileBasic::InitObstacle()
 	return true;
 }
 
-bool ATileBasic::IsOverlapped() const
-{
-	return OverlapFlag;
-}
+bool ATileBasic::IsOverlapped() const {	return OverlapFlag;   }
+
+int32 ATileBasic::GetTileIdx() const {	return TileIdx == -1 ? 0 : TileIdx;    }
 
 void ATileBasic::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
 	, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -105,7 +104,9 @@ void ATileBasic::DestroyObstacle()
 
 	for(int idx=SpawnedObstacleArr.Num()-1; idx>=0; idx--)
 	{
-		if (SpawnedObstacleArr[idx] != nullptr) SpawnedObstacleArr[idx]->Destroy();
-		if (SpawnedObstacleArr.IsValidIndex(idx)) SpawnedObstacleArr.RemoveAt(idx);
+		if (SpawnedObstacleArr.IsValidIndex(idx)) continue;
+		AActor* DestroyTarget = SpawnedObstacleArr[idx];
+		if (DestroyTarget != nullptr && IsValid(DestroyTarget)) DestroyTarget->Destroy();
+		SpawnedObstacleArr.RemoveAt(idx);
 	}
 }
