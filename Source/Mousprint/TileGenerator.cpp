@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TileGenerator.h"
+#include "TileSpawnInfoTable.h"
 #include "Math/UnrealMathUtility.h"
 
 // Sets default values
@@ -28,12 +29,28 @@ void ATileGenerator::Tick(float DeltaTime)
 	if (SpawnedTileArr.Num() <= MaxSpawnTileCnt && !bIsSpawningTile)
 	{
 		bIsSpawningTile = true; //중복 스폰 방지
-		bool bIsCurve = (FMath::RandRange(0, 100) < CurveTileSpawnPercentage);
 		int32 nextTileIdx = -1;  
 		ATileBasic* SpawnedTile = nullptr;
 
+		/*--- 다음 스폰할 타일의 Idx와 유형을 무작위로 선택 ---*/
+		bool bIsCurve = (FMath::RandRange(0, 100) < CurveTileSpawnPercentage);
 		if (bIsCurve) nextTileIdx = FMath::RandRange(SpawnTileMinIdx, SpawnTileMaxIdx);
 		else nextTileIdx = FMath::RandRange(SpawnTileMinIdx+1, SpawnTileMaxIdx); //맨 시작 타일은 제외
+
+		/*--- 다음 스폰할 타일의 스폰 확률을 계산 (DB로부터 읽음) ---*/
+		if (TileSpawnInfoTable != nullptr)
+		{
+			FTileSpawnInfoTableRow* TileSpawnInfoRow = TileSpawnInfoTable->FindRow<FTileSpawnInfoTableRow>
+				(FName(*(FString::FormatAsNumber(nextTileIdx))), FString(""));
+			
+			if (bIsCurve && FMath::RandRange(1, 100) > TileSpawnInfoRow->SpawnPercentage_Curve) return;
+			else if (!bIsCurve && FMath::RandRange(1, 100) > TileSpawnInfoRow->SpawnPercentage_Straight) return;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("TileGenerator : TileSpawnInfoTable Is Not Found!"));
+		}
+
 	
 		if(nextTileIdx != prevTileIdx || bIsCurve != prevTileType)
 			SpawnedTile = SpawnTile(false, nextTileIdx, bIsCurve); 
@@ -79,8 +96,6 @@ ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, int TileIdx, bool bIs
 
 	prevTileType = bIsCurve;
 	prevTileIdx = TileIdx;
-
-	//UE_LOG(LogTemp, Warning, TEXT("Tile Spawned")); //디버그 Log
 
 	FRotator BeginRotation = GetNextSpawnTransform().GetRotation().Rotator();
 	FVector BeginLocation;	

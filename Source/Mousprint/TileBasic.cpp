@@ -43,7 +43,7 @@ void ATileBasic::BeginPlay()
 
 	InitObstacle();
 
-	if (UseObstacleCount > ObstacleSpawnPointArray.Num())
+	if (ObstaclePointUseCount > ObstacleSpawnPointArray.Num())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Variable \"UseObstacle\" is Overflowed!!!"));
 	}
@@ -60,29 +60,40 @@ FTransform ATileBasic::GetNextSpawnPoint() const
 	return EdgeArrowComponent->GetComponentTransform(); 
 }
 
+void ATileBasic::SetTileSpawnInfo(const int32 _ObstaclePointUseCount, const int32 _MaxSpawnObstacleCount
+	, const float _ObstacleSpawnPercentage)
+{
+	ObstaclePointUseCount = _ObstaclePointUseCount;
+	MaxSpawnObstacleCount = _MaxSpawnObstacleCount;
+	ObstacleSpawnPercentage = _ObstacleSpawnPercentage;
+}
+
 bool ATileBasic::InitObstacle()
 {
-	if (!GetWorld() || !ObstacleClass || ObstacleSpawnPointArray.Num() == 0) return false;
-	
+	if (!GetWorld() || !ObstacleClass || ObstacleSpawnPointArray.Num() == 0 || ObstaclePointUseCount == 0) return false;
+
 	const FActorSpawnParameters SpawnParams;
 
-	//SpawnParams.Instigator = this;
+	const int32 endIdx = FMath::RandRange(0, ObstaclePointUseCount - 1);
+	int32 idx = endIdx;
 
-	for(int i = FMath::RandRange(0, UseObstacleCount - 1); ;)
+	do
 	{
 		if (SpawnedObstacleCnt >= MaxSpawnObstacleCount) break;
-		if (SpawnedObstacleCnt >= UseObstacleCount) break;
+		if (!ObstacleSpawnPointArray.IsValidIndex(idx)) break;
 
-		const auto target = ObstacleSpawnPointArray[i];
-		if (FMath::RandRange(1, 100) > 100.0f - ObstacleSpawnPercentage)
+		const auto target = ObstacleSpawnPointArray[idx];
+		if (FMath::RandRange(1, 100) >= 100.0f - ObstacleSpawnPercentage)
 		{
 			AActor* SpawnedObstacle = GetWorld()->SpawnActor<AActor>(ObstacleClass, target->GetComponentLocation(), target->GetComponentRotation());
 			if (SpawnedObstacle == nullptr) continue;
 			SpawnedObstacleArr.Push(SpawnedObstacle);
 			SpawnedObstacleCnt++;
 		}
-		i = ((i + 1) % UseObstacleCount);
-	}
+		idx = (idx + 1) % ObstaclePointUseCount;
+	} while (idx != endIdx);
+	
+
 	return true;
 }
 

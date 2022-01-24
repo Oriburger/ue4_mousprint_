@@ -194,7 +194,7 @@ void AMainCharacter::Aim()
 	//UE_LOG(LogTemp, Warning, TEXT("Aim"));
 
 	bIsAimed = true;
-	GetCharacterMovement()->MaxWalkSpeed = CharacterWalkSpeed * 0.75;
+	GetCharacterMovement()->MaxWalkSpeed = CharacterWalkSpeed * 0.75f;
 
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;
@@ -222,6 +222,7 @@ void AMainCharacter::StartSlide()
 	if (GetCharacterMovement()->IsCrouching() || bIsDead || bIsRagdoll) return;
 
 	StopJump();
+	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterWalkSpeed;
 
 	//UE_LOG(LogTemp, Warning, TEXT("Crouch"));
 	ACharacter::Crouch();
@@ -238,6 +239,7 @@ void AMainCharacter::TryStopSlide(const float DeltaTime, const bool force)
 		if (CrouchingTime < 0.5f) return;
 	}
 	//UE_LOG(LogTemp, Warning, TEXT("UnCrouch"));
+	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterWalkSpeed * 0.75f;
 	ACharacter::UnCrouch();
 	CrouchingTime = 0;
 }
@@ -254,7 +256,7 @@ void AMainCharacter::StartRush()
 	FTimerHandle WaitHandle;
 	float WaitTime = 0.2f;
 	GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
-		{ LaunchCharacter(GetVelocity() * 1.25f, true, false); }), WaitTime, false); 
+		{ LaunchCharacter(GetVelocity() * 1.15f, true, false); }), WaitTime, false); 
 	
 	GetCharacterMovement()->DefaultLandMovementMode = MOVE_Walking;
 }

@@ -3,7 +3,6 @@
 #pragma once
 
 #include "EngineMinimal.h"
-#include "Weapon.h"
 #include "Bullet.h"
 #include "PathBase.h"
 #include "Sound/SoundWave.h"
