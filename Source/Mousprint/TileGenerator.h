@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "TileBasic.h"
 #include "Containers/Array.h"
-#include "Containers/Queue.h"
+#include "TileSpawnInfoTable.h"
 #include "TileGenerator.generated.h"
 
 UCLASS()
@@ -16,12 +16,13 @@ class MOUSPRINT_API ATileGenerator : public AActor
 
 private:
 	TArray<ATileBasic*> SpawnedTileArr; //스폰된 타일의 주소를 저장하는 배열
+	int32 Stage = 1;
 	int32 SpawnTileMinIdx = 0; //스폰할 타일 액터의 시작 Idx
 	int32 SpawnTileMaxIdx = 0; //스폰할 타일 액터의 끝 Idx
 		
 	bool prevCurveTileType = 0; //0 왼쪽 1 오른쪽
 	bool prevTileType; //이전에 스폰된 타일 유형 - 0 직선, 1 커브
-	int32 prevTileIdx = 0; //이전에 스폰된 타일의 Idx
+	int32 prevTileIdx = -1; //이전에 스폰된 타일의 Idx
 
 	bool bIsSpawningTile = false; //타일이 겹치게 스폰되는 것을 방지하는 변수
 
@@ -60,7 +61,10 @@ public:
 		FTransform GetNextSpawnTransform() const; //다음 스폰될 타일의 위치를 반환
 
 	UFUNCTION()
-		ATileBasic* SpawnTile(const bool _bIsInit, int TileIdx, bool bIsCurve); //타일을 스폰
+		int32 GetNextSpawnTileIdx();
+
+	UFUNCTION()
+		ATileBasic* SpawnTile(TSubclassOf<class ATileBasic>& SpawnTarget); //타일을 스폰
 																 //_bIsInit : 최초 스폰 시 true로 전달 
 																 //TileIdx : 스폰할 타일 클래스의 idx를 전달
 	UFUNCTION(BlueprintCallable)

@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TileGenerator.h"
-#include "TileSpawnInfoTable.h"
 #include "Math/UnrealMathUtility.h"
 
 // Sets default values
@@ -17,7 +16,13 @@ ATileGenerator::ATileGenerator()
 void ATileGenerator::BeginPlay()
 {
 	Super::BeginPlay();
-	SpawnedTileArr.Push(SpawnTile(true, SpawnTileMinIdx, false)); //게임 시작 시 하나는 스폰
+	
+	ATileBasic* InitialTile = SpawnTile(BeginTileClassArray[Stage - 1]);
+	if (InitialTile)
+	{
+		InitialTile->FinishSpawning(GetNextSpawnTransform());
+		SpawnedTileArr.Push(InitialTile); //게임 시작 시 하나는 스폰
+	}
 }
 
 // Called every frame
@@ -28,38 +33,41 @@ void ATileGenerator::Tick(float DeltaTime)
 	//스폰 된 타일의 수가 MaxSpawnTileCnt보다 작고, 스폰 작업 중이 아니라면
 	if (SpawnedTileArr.Num() <= MaxSpawnTileCnt && !bIsSpawningTile)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : Tick!"));
 		bIsSpawningTile = true; //중복 스폰 방지
-		int32 nextTileIdx = -1;  
+
 		ATileBasic* SpawnedTile = nullptr;
-
-		/*--- 다음 스폰할 타일의 Idx와 유형을 무작위로 선택 ---*/
-		bool bIsCurve = (FMath::RandRange(0, 100) < CurveTileSpawnPercentage);
-		if (bIsCurve) nextTileIdx = FMath::RandRange(SpawnTileMinIdx, SpawnTileMaxIdx);
-		else nextTileIdx = FMath::RandRange(SpawnTileMinIdx+1, SpawnTileMaxIdx); //맨 시작 타일은 제외
-
-		/*--- 다음 스폰할 타일의 스폰 확률을 계산 (DB로부터 읽음) ---*/
-		if (TileSpawnInfoTable != nullptr)
-		{
-			FTileSpawnInfoTableRow* TileSpawnInfoRow = TileSpawnInfoTable->FindRow<FTileSpawnInfoTableRow>
-				(FName(*(FString::FormatAsNumber(nextTileIdx))), FString(""));
-			
-			if (bIsCurve && FMath::RandRange(1, 100) > TileSpawnInfoRow->SpawnPercentage_Curve) return;
-			else if (!bIsCurve && FMath::RandRange(1, 100) > TileSpawnInfoRow->SpawnPercentage_Straight) return;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("TileGenerator : TileSpawnInfoTable Is Not Found!"));
-		}
-
+		int32 nextTileIdx = GetNextSpawnTileIdx();  
+		FTileSpawnInfoTableRow * TileSpawnInfoRow = nullptr;
 	
-		if(nextTileIdx != prevTileIdx || bIsCurve != prevTileType)
-			SpawnedTile = SpawnTile(false, nextTileIdx, bIsCurve); 
-		
-		if(SpawnedTile != nullptr)
-			SpawnedTileArr.Push(SpawnedTile);//Spawn 된 타일을 Arr에 넣음
-		
+		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : next tile idx is %d"), nextTileIdx);
+
+		if (nextTileIdx != -1)
+		{
+			if(prevTileType && CurveTileClassArray.IsValidIndex(nextTileIdx))
+				SpawnedTile = SpawnTile(CurveTileClassArray[nextTileIdx]);
+			else if(!prevTileType && StraightTileClassArray.IsValidIndex(nextTileIdx))
+				SpawnedTile = SpawnTile(StraightTileClassArray[nextTileIdx]);
+
+			if (SpawnedTile != nullptr)
+			{
+				if (TileSpawnInfoTable != nullptr)
+				{
+					TileSpawnInfoRow = TileSpawnInfoTable->FindRow<FTileSpawnInfoTableRow>
+						(FName(*(FString::FormatAsNumber(nextTileIdx))), FString(""));
+
+					if (TileSpawnInfoRow != nullptr)
+						SpawnedTile->SetTileSpawnInfo(TileSpawnInfoRow->TotalObstacleCount, TileSpawnInfoRow->MaxSpawnObstacleCount
+							, TileSpawnInfoRow->SpawnPercentage_Obstacle);
+				}
+				SpawnedTile->FinishSpawning(GetNextSpawnTransform());
+				SpawnedTileArr.Push(SpawnedTile);//Spawn 된 타일을 Arr에 넣음
+			}
+		}
+
 		bIsSpawningTile = false;
 	}
+
 	if (SpawnedTileArr.IsValidIndex(10) //플레이어가 2번째 타일의 오버랩 볼륨에 닿았다면
 		&& SpawnedTileArr[10]->IsOverlapped())
 	{
@@ -79,35 +87,63 @@ FTransform ATileGenerator::GetNextSpawnTransform() const
 	return SpawnedTileArr.Last()->GetNextSpawnPoint(); //맨 앞의 타일의 Arrow Transform 반환
 }
 
-ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, int TileIdx, bool bIsCurve)
+int32 ATileGenerator::GetNextSpawnTileIdx() 
 {
-	if (!GetWorld()) return nullptr; //Idx 정보가 Invalid 라면 nullptr 반환
-	if (bIsCurve)
-	{	
-		if (!CurveTileClassArray.IsValidIndex(TileIdx)) return nullptr;
-		if (prevCurveTileType && TileIdx % 2 == 1) TileIdx -= 1;
-		else if (!prevCurveTileType && TileIdx % 2 == 0) TileIdx += 1;
-		prevCurveTileType = (TileIdx % 2 == 1);
+	int32 nextTileIdx = -1;
+	FTileSpawnInfoTableRow* TileSpawnInfoRow = nullptr;
+
+	/*--- 다음 스폰할 타일의 Idx와 유형을 무작위로 선택 ---*/
+	bool nextTileType = (FMath::RandRange(0, 100) < CurveTileSpawnPercentage);
+
+	if (nextTileType) nextTileIdx = FMath::RandRange(SpawnTileMinIdx, SpawnTileMaxIdx);
+	else nextTileIdx = FMath::RandRange(SpawnTileMinIdx + 1, SpawnTileMaxIdx); //맨 시작 타일은 제외
+
+	if (nextTileIdx == prevTileIdx && nextTileType == prevTileType) return -1;
+
+	/*--- 다음 스폰할 타일의 스폰 확률을 계산 (DB로부터 읽음) ---*/
+	if (TileSpawnInfoTable != nullptr)
+	{
+		TileSpawnInfoRow = TileSpawnInfoTable->FindRow<FTileSpawnInfoTableRow>
+			(FName(*(FString::FormatAsNumber(nextTileIdx))), FString(""));
+
+		if (FMath::RandRange(1, 100) > TileSpawnInfoRow->SpawnPercentage) return -1;
 	}
-	else if (!StraightTileClassArray.IsValidIndex(TileIdx)) return nullptr;
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : TileSpawnInfoTable Is Not Found!"));
+	}
 
-	TSubclassOf<class ATileBasic>& SpawnTarget = (bIsCurve ? CurveTileClassArray[TileIdx] : StraightTileClassArray[TileIdx]);
-	if (SpawnTarget == nullptr) return nullptr;
+	/*--- 곡선 타일로 인해 타일들이 겹치는 현상 방지 ---*/
+	if (nextTileType)
+	{
+		if (prevCurveTileType && nextTileIdx % 2 == 1) nextTileIdx -= 1;
+		else if (!prevCurveTileType && nextTileIdx % 2 == 0) nextTileIdx += 1;
+		prevCurveTileType = (nextTileIdx % 2 == 1);
+	}
 
-	prevTileType = bIsCurve;
-	prevTileIdx = TileIdx;
+	prevTileType = nextTileType;
+	prevTileIdx = nextTileIdx; 
 
-	FRotator BeginRotation = GetNextSpawnTransform().GetRotation().Rotator();
-	FVector BeginLocation;	
-	if (_bIsInit) BeginLocation = FVector(0, 0, 0); //최초 스폰 시 초기 위치는 {0,0,0}
-	else BeginLocation = GetNextSpawnTransform().GetLocation(); 
+	return nextTileIdx;
+}
+
+ATileBasic* ATileGenerator::SpawnTile(TSubclassOf<class ATileBasic>& SpawnTarget)
+{
+	if (!GetWorld()) return nullptr; 
+	if (SpawnTarget == nullptr || !IsValid(SpawnTarget)) return nullptr;	
+
+	//SpawnTransform 및 인자 지정
+	FTransform SpawnTransform;
+	SpawnTransform.SetLocation(GetNextSpawnTransform().GetLocation());
+	SpawnTransform.SetRotation(GetNextSpawnTransform().GetRotation());
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this; //타일의 소유자는 Generator
 	SpawnParams.Instigator = GetInstigator(); 
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	//타일을 스폰하고 반환
-	ATileBasic* NewTile = GetWorld()->SpawnActor<ATileBasic>(SpawnTarget, BeginLocation, BeginRotation);
+	//타일을 스폰하고 반환 (SpawnActorDeferred 함수 : BeginPlay 호출을 지연시킴)
+	ATileBasic* NewTile = GetWorld()->SpawnActorDeferred<ATileBasic>(SpawnTarget, SpawnTransform);
 	
 	return NewTile;
 }
@@ -115,6 +151,8 @@ ATileBasic* ATileGenerator::SpawnTile(const bool _bIsInit, int TileIdx, bool bIs
 bool ATileGenerator::SetSpawnTileIdxRange(const int32 start, const int32 finish)
 {
 	if (start > finish) return false;
+
+	UE_LOG(LogTemp, Warning, TEXT("TileGenerator : Range is %d to %d"), start, finish);
 	SpawnTileMinIdx = start;
 	SpawnTileMaxIdx = finish;
 	return true;
