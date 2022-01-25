@@ -106,7 +106,11 @@ int32 ATileGenerator::GetNextSpawnTileIdx()
 		TileSpawnInfoRow = TileSpawnInfoTable->FindRow<FTileSpawnInfoTableRow>
 			(FName(*(FString::FormatAsNumber(nextTileIdx))), FString(""));
 
-		if (FMath::RandRange(1, 100) > TileSpawnInfoRow->SpawnPercentage) return -1;
+		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : TileSpawnPercentage is %lf"), TileSpawnInfoRow->SpawnPercentage_Curve);
+		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : TileSpawnPercentage is %lf"), TileSpawnInfoRow->SpawnPercentage_Straight);
+
+		if (nextTileType && FMath::RandRange(1, 100) > TileSpawnInfoRow->SpawnPercentage_Curve) return -1;
+		else if (!nextTileType && FMath::RandRange(1, 100) > TileSpawnInfoRow->SpawnPercentage_Straight) return -1;
 	}
 	else
 	{

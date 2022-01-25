@@ -16,10 +16,13 @@ public:
 		int32 Stage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		float SpawnPercentage;
+		float SpawnPercentage_Straight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		float ObstacleSpawnPercentage;
+		float SpawnPercentage_Curve;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float SpawnPercentage_Obstacle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		int32 TotalObstacleCount;
