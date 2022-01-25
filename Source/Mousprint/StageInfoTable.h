@@ -20,10 +20,16 @@ public:
 		float StartTime;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		int32 MinTileIdx;
+		int32 MinTileIdx_Straight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		int32 MaxTileIdx;
+		int32 MaxTileIdx_Straight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int32 MinTileIdx_Curve;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int32 MaxTileIdx_Curve;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		float MinPlayerSpeed;

@@ -32,7 +32,8 @@ void AMainGameModeBase::BeginPlay()
 		FStageInfoTableRow* StageInfoRow = StageInfoTable->FindRow<FStageInfoTableRow>
 				(FName(*(FString::FormatAsNumber(Stage))), FString(""));
 		
-		TileGenerator->SetSpawnTileIdxRange((*StageInfoRow).MinTileIdx, (*StageInfoRow).MaxTileIdx);
+		TileGenerator->SetSpawnTileIdxRange((*StageInfoRow).MinTileIdx_Straight, (*StageInfoRow).MaxTileIdx_Straight
+											,(*StageInfoRow).MinTileIdx_Curve, (*StageInfoRow).MaxTileIdx_Curve);
 
 		MainCharacter = Cast<AMainCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 		MainCharacter->SetWalkSpeedLimit((*StageInfoRow).MinPlayerSpeed, (*StageInfoRow).MaxPlayerSpeed);

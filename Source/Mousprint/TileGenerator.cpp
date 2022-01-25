@@ -38,31 +38,14 @@ void ATileGenerator::Tick(float DeltaTime)
 
 		ATileBasic* SpawnedTile = nullptr;
 		int32 nextTileIdx = GetNextSpawnTileIdx();  
-		FTileSpawnInfoTableRow * TileSpawnInfoRow = nullptr;
 	
 		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : next tile idx is %d"), nextTileIdx);
 
-		if (nextTileIdx != -1)
+		if (nextTileIdx != -1 && TileClassArray.IsValidIndex(nextTileIdx))
 		{
-			if(prevTileType && CurveTileClassArray.IsValidIndex(nextTileIdx))
-				SpawnedTile = SpawnTile(CurveTileClassArray[nextTileIdx]);
-			else if(!prevTileType && StraightTileClassArray.IsValidIndex(nextTileIdx))
-				SpawnedTile = SpawnTile(StraightTileClassArray[nextTileIdx]);
+			SpawnedTile = SpawnTile(TileClassArray[nextTileIdx]);
 
-			if (SpawnedTile != nullptr)
-			{
-				if (TileSpawnInfoTable != nullptr)
-				{
-					TileSpawnInfoRow = TileSpawnInfoTable->FindRow<FTileSpawnInfoTableRow>
-						(FName(*(FString::FormatAsNumber(nextTileIdx))), FString(""));
-
-					if (TileSpawnInfoRow != nullptr)
-						SpawnedTile->SetTileSpawnInfo(TileSpawnInfoRow->TotalObstacleCount, TileSpawnInfoRow->MaxSpawnObstacleCount
-							, TileSpawnInfoRow->SpawnPercentage_Obstacle);
-				}
-				SpawnedTile->FinishSpawning(GetNextSpawnTransform());
-				SpawnedTileArr.Push(SpawnedTile);//Spawn 된 타일을 Arr에 넣음
-			}
+			if(SpawnedTile != nullptr)	SpawnedTileArr.Push(SpawnedTile);//Spawn 된 타일을 Arr에 넣음
 		}
 
 		bIsSpawningTile = false;
@@ -90,32 +73,14 @@ FTransform ATileGenerator::GetNextSpawnTransform() const
 int32 ATileGenerator::GetNextSpawnTileIdx() 
 {
 	int32 nextTileIdx = -1;
-	FTileSpawnInfoTableRow* TileSpawnInfoRow = nullptr;
 
 	/*--- 다음 스폰할 타일의 Idx와 유형을 무작위로 선택 ---*/
 	bool nextTileType = (FMath::RandRange(0, 100) < CurveTileSpawnPercentage);
 
-	if (nextTileType) nextTileIdx = FMath::RandRange(SpawnTileMinIdx, SpawnTileMaxIdx);
-	else nextTileIdx = FMath::RandRange(SpawnTileMinIdx + 1, SpawnTileMaxIdx); //맨 시작 타일은 제외
+	if (nextTileType) nextTileIdx = FMath::RandRange(CurveTileMinIdx, CurveTileMaxIdx);
+	else nextTileIdx = FMath::RandRange(StraightTileMinIdx, StraightTileMaxIdx); //맨 시작 타일은 제외
 
-	if (nextTileIdx == prevTileIdx && nextTileType == prevTileType) return -1;
-
-	/*--- 다음 스폰할 타일의 스폰 확률을 계산 (DB로부터 읽음) ---*/
-	if (TileSpawnInfoTable != nullptr)
-	{
-		TileSpawnInfoRow = TileSpawnInfoTable->FindRow<FTileSpawnInfoTableRow>
-			(FName(*(FString::FormatAsNumber(nextTileIdx))), FString(""));
-
-		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : TileSpawnPercentage is %lf"), TileSpawnInfoRow->SpawnPercentage_Curve);
-		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : TileSpawnPercentage is %lf"), TileSpawnInfoRow->SpawnPercentage_Straight);
-
-		if (nextTileType && FMath::RandRange(1, 100) > TileSpawnInfoRow->SpawnPercentage_Curve) return -1;
-		else if (!nextTileType && FMath::RandRange(1, 100) > TileSpawnInfoRow->SpawnPercentage_Straight) return -1;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : TileSpawnInfoTable Is Not Found!"));
-	}
+//	if (nextTileType == prevTileType && nextTileIdx == prevTileIdx) return -1;
 
 	/*--- 곡선 타일로 인해 타일들이 겹치는 현상 방지 ---*/
 	if (nextTileType)
@@ -147,18 +112,21 @@ ATileBasic* ATileGenerator::SpawnTile(TSubclassOf<class ATileBasic>& SpawnTarget
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	//타일을 스폰하고 반환 (SpawnActorDeferred 함수 : BeginPlay 호출을 지연시킴)
-	ATileBasic* NewTile = GetWorld()->SpawnActorDeferred<ATileBasic>(SpawnTarget, SpawnTransform);
+	ATileBasic* NewTile = GetWorld()->SpawnActor<ATileBasic>(SpawnTarget, SpawnTransform, SpawnParams);
 	
 	return NewTile;
 }
 
-bool ATileGenerator::SetSpawnTileIdxRange(const int32 start, const int32 finish)
+bool ATileGenerator::SetSpawnTileIdxRange(const int32 start_straight, const int32 finish_straight
+										, const int32 start_curve, const int32 finish_curve)
 {
-	if (start > finish) return false;
+	if (start_straight > finish_straight || start_curve > finish_curve) return false;
 
-	UE_LOG(LogTemp, Warning, TEXT("TileGenerator : Range is %d to %d"), start, finish);
-	SpawnTileMinIdx = start;
-	SpawnTileMaxIdx = finish;
+	StraightTileMinIdx = start_straight;
+	StraightTileMaxIdx = finish_straight;
+	CurveTileMinIdx = start_curve;
+	CurveTileMaxIdx = finish_curve;
+
 	return true;
 }
 

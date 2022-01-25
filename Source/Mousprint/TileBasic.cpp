@@ -42,11 +42,6 @@ void ATileBasic::BeginPlay()
 	BoxTrigger->OnComponentEndOverlap.AddDynamic(this, &ATileBasic::OnEndOverlap); //오버랩 이벤트를 추가
 
 	InitObstacle();
-
-	if (ObstaclePointUseCount > ObstacleSpawnPointArray.Num())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Variable \"UseObstacle\" is Overflowed!!!"));
-	}
 }
 
 // Called every frame
@@ -60,46 +55,27 @@ FTransform ATileBasic::GetNextSpawnPoint() const
 	return EdgeArrowComponent->GetComponentTransform(); 
 }
 
-void ATileBasic::SetTileSpawnInfo(const int32 _ObstaclePointUseCount, const int32 _MaxSpawnObstacleCount
-	, const float _ObstacleSpawnPercentage)
-{
-	ObstaclePointUseCount = _ObstaclePointUseCount;
-	MaxSpawnObstacleCount = _MaxSpawnObstacleCount;
-	ObstacleSpawnPercentage = _ObstacleSpawnPercentage;
-}
-
 bool ATileBasic::InitObstacle()
 {
-	if (!GetWorld() || !ObstacleClass || ObstacleSpawnPointArray.Num() == 0 || ObstaclePointUseCount == 0) return false;
+	if (!GetWorld() || ObstacleClassArray.Num() == 0 || ObstacleSpawnPointArray.Num() == 0) return false;
 
-	const FActorSpawnParameters SpawnParams;
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this; //타일의 소유자는 Generator
+	SpawnParams.Instigator = GetInstigator();
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	const int32 endIdx = FMath::RandRange(0, ObstaclePointUseCount - 1);
-	int32 idx = endIdx;
-
-	do
+	for (int i = 0; i < MaxObstacleCount; i++)
 	{
-		if (SpawnedObstacleCnt >= MaxSpawnObstacleCount) break;
-		if (!ObstacleSpawnPointArray.IsValidIndex(idx)) break;
-
-		const auto target = ObstacleSpawnPointArray[idx];
-		if (FMath::RandRange(1, 100) >= 100.0f - ObstacleSpawnPercentage)
-		{
-			AActor* SpawnedObstacle = GetWorld()->SpawnActor<AActor>(ObstacleClass, target->GetComponentLocation(), target->GetComponentRotation());
-			if (SpawnedObstacle == nullptr) continue;
-			SpawnedObstacleArr.Push(SpawnedObstacle);
-			SpawnedObstacleCnt++;
-		}
-		idx = (idx + 1) % ObstaclePointUseCount;
-	} while (idx != endIdx);
-	
-
+		FTransform SpawnTransform = ObstacleSpawnPointArray[i]->GetComponentTransform();
+		const int32 ObstacleIdx = FMath::RandRange(0, ObstacleClassArray.Num() - 1);
+		AActor* NewObstacle = GetWorld()->SpawnActor(ObstacleClassArray[ObstacleIdx], &SpawnTransform, SpawnParams);
+		SpawnedObstacleArr.Push(NewObstacle);
+	}
 	return true;
 }
 
-bool ATileBasic::IsOverlapped() const {	return OverlapFlag;   }
+bool ATileBasic::IsOverlapped() const {	return OverlapFlag; }
 
-int32 ATileBasic::GetTileIdx() const {	return TileIdx == -1 ? 0 : TileIdx;    }
 
 void ATileBasic::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
 	, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
