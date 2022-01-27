@@ -152,15 +152,14 @@ void AMainCharacter::Fire()
 	FVector TraceBeginLocation = FollowingCamera->GetComponentLocation(); //Trace는 카메라에서 시작
 	FVector TraceEndLocation = TraceBeginLocation + (FollowingCamera->GetForwardVector()) * 200000.0f; //End는 Camera로부터 20000.0f 떨어진 지점까지
 	FCollisionQueryParams TraceCollisionQuery = FCollisionQueryParams::DefaultQueryParam;
-	TraceCollisionQuery.AddIgnoredActor(this->GetUniqueID());
+	TraceCollisionQuery.AddIgnoredActor(this->GetUniqueID());  //플레이어의 카메라가 Hit되지 않도록 방지
 
 
 	GetWorld()->LineTraceSingleByChannel(LineTraceHitResult, TraceBeginLocation, TraceEndLocation
-		, ECollisionChannel::ECC_Camera, TraceCollisionQuery); //LineTrace
+		, ECollisionChannel::ECC_Camera, TraceCollisionQuery); //LineTrace 시작
 
-	FVector BeginLocation = Weapon->GetSocketLocation(TEXT("Muzzle")); //발사 시작은 Muzzle 소켓의 위치 
-	//Muzzle 소켓에서 LineTrace이 Hit된 위치까지의 Rotataion이 발사각
-	FRotator BeginRotation = UKismetMathLibrary::FindLookAtRotation(BeginLocation, LineTraceHitResult.ImpactPoint);
+	FVector BeginLocation = Weapon->GetSocketLocation(TEXT("Muzzle")); //발사 시작은 Blaster의 소켓 "Muzzle"의 위치 
+	FRotator BeginRotation = UKismetMathLibrary::FindLookAtRotation(BeginLocation, LineTraceHitResult.ImpactPoint); //Muzzle 소켓에서 LineTrace이 Hit된 위치까지의 Rotataion이 발사각
 
 	//만약 LineTrace에 Hit 된 타겟이 없다면, 카메라의 Rotation을 따라감 
 	if (LineTraceHitResult.GetActor() == nullptr && LineTraceHitResult.GetComponent() == nullptr)
