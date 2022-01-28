@@ -4,7 +4,7 @@
 
 > ⏲️ 2021/10/23 개발 start
 
-> [📜 Notion Page](https://oriburger.notion.site/Mousprint-94fa53a30a514273af9dec54c3910555)
+> [📜 Notion Page / 현재 비공개](https://oriburger.notion.site/Mousprint-94fa53a30a514273af9dec54c3910555)
 
 <br>
 
