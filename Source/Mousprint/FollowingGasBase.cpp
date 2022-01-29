@@ -39,7 +39,7 @@ void AFollowingGasBase::BeginPlay()
 	SpawnDefaultController();
 	PathFindingCollision->SetRelativeScale3D(FVector(100.0f, 100.0f, 100.0f));
 
-	AddMovementInput(GetActorRotation().Vector().UpVector, -1.0f);
+	//LaunchCharacter(GetActorRotation().Vector().UpVector * -5, false, false);
 }
 
 // Called every frame

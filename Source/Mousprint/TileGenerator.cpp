@@ -18,11 +18,7 @@ void ATileGenerator::BeginPlay()
 	Super::BeginPlay();
 	
 	ATileBasic* InitialTile = SpawnTile(BeginTileClassArray[Stage - 1]);
-	if (InitialTile)
-	{
-		InitialTile->FinishSpawning(GetNextSpawnTransform());
-		SpawnedTileArr.Push(InitialTile); //게임 시작 시 하나는 스폰
-	}
+	if (InitialTile) SpawnedTileArr.Push(InitialTile); //게임 시작 시 하나는 스폰
 }
 
 // Called every frame
@@ -33,18 +29,17 @@ void ATileGenerator::Tick(float DeltaTime)
 	//스폰 된 타일의 수가 MaxSpawnTileCnt보다 작고, 스폰 작업 중이 아니라면
 	if (SpawnedTileArr.Num() <= MaxSpawnTileCnt && !bIsSpawningTile)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : Tick!"));
+		//UE_LOG(LogTemp, Warning, TEXT("TileGenerator : Tick!"));
 		bIsSpawningTile = true; //중복 스폰 방지
 
 		ATileBasic* SpawnedTile = nullptr;
 		int32 nextTileIdx = GetNextSpawnTileIdx();  
 	
-		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : next tile idx is %d"), nextTileIdx);
+		//UE_LOG(LogTemp, Warning, TEXT("TileGenerator : next tile idx is %d"), nextTileIdx);
 
 		if (nextTileIdx != -1 && TileClassArray.IsValidIndex(nextTileIdx))
 		{
 			SpawnedTile = SpawnTile(TileClassArray[nextTileIdx]);
-
 			if(SpawnedTile != nullptr)	SpawnedTileArr.Push(SpawnedTile);//Spawn 된 타일을 Arr에 넣음
 		}
 
@@ -57,8 +52,9 @@ void ATileGenerator::Tick(float DeltaTime)
 		ATileBasic* DestoyTarget = SpawnedTileArr[0];
 		if (DestoyTarget != nullptr && IsValid(DestoyTarget))
 		{
-			DestoyTarget->DestroyObstacle(); //0번째 타일을 Destroy
-			DestoyTarget->Destroy();
+			UE_LOG(LogTemp, Warning, TEXT("TileGenerator : Tile Removed"));
+			DestoyTarget->DestroyObstacle();
+			DestoyTarget->Destroy();  //0번째 타일을 Destroy
 		}
 		SpawnedTileArr.RemoveAt(0); //배열로부터 제거
 	}

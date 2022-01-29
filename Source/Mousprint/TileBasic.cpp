@@ -87,13 +87,20 @@ void ATileBasic::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 void ATileBasic::DestroyObstacle()
 {
 	//스폰한 장애물들을 전부 반환
+
+	UE_LOG(LogTemp, Warning, TEXT("TileBasic : DestroyObstacle()-----"));
+
 	if (SpawnedObstacleArr.Num() == 0) return;
 
-	for(int idx=SpawnedObstacleArr.Num()-1; idx>=0; idx--)
+	UE_LOG(LogTemp, Warning, TEXT("TileBasic : Obstacle Total Count = %d"), SpawnedObstacleArr.Num());
+
+	for(int idx = SpawnedObstacleArr.Num()-1; idx>=0; idx--)
 	{
-		if (SpawnedObstacleArr.IsValidIndex(idx)) continue;
+		if (!SpawnedObstacleArr.IsValidIndex(idx)) continue;
 		AActor* DestroyTarget = SpawnedObstacleArr[idx];
 		if (DestroyTarget != nullptr && IsValid(DestroyTarget)) DestroyTarget->Destroy();
 		SpawnedObstacleArr.RemoveAt(idx);
+
+		UE_LOG(LogTemp, Warning, TEXT("TileBasic : Removed Obstacle #%d"), idx);
 	}
 }

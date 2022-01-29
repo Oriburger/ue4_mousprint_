@@ -20,24 +20,7 @@ void AMainGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this; //타일의 소유자는 Generator
-	SpawnParams.Instigator = GetInstigator();
-
-	TileGenerator = GetWorld()->SpawnActor<ATileGenerator>(TileGeneratorClass, SpawnParams);
-	if (TileGenerator == nullptr) return;
-
-	if (StageInfoTable != nullptr)
-	{
-		FStageInfoTableRow* StageInfoRow = StageInfoTable->FindRow<FStageInfoTableRow>
-				(FName(*(FString::FormatAsNumber(Stage))), FString(""));
-		
-		TileGenerator->SetSpawnTileIdxRange((*StageInfoRow).MinTileIdx_Straight, (*StageInfoRow).MaxTileIdx_Straight
-											,(*StageInfoRow).MinTileIdx_Curve, (*StageInfoRow).MaxTileIdx_Curve);
-
-		MainCharacter = Cast<AMainCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-		MainCharacter->SetWalkSpeedLimit((*StageInfoRow).MinPlayerSpeed, (*StageInfoRow).MaxPlayerSpeed);
-	}
+	
 }
 
 // Called every frame
@@ -49,4 +32,30 @@ void AMainGameModeBase::Tick(float DeltaTime)
 	{
 		Score = Score + DeltaTime * 10;
 	}
+}
+
+bool AMainGameModeBase::GameStart()
+{
+	if (!GetWorld()) return false;
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this; //타일의 소유자는 Generator
+	SpawnParams.Instigator = GetInstigator();
+
+	TileGenerator = GetWorld()->SpawnActor<ATileGenerator>(TileGeneratorClass, SpawnParams);
+	if (TileGenerator == nullptr) return false;
+
+	if (StageInfoTable != nullptr)
+	{
+		FStageInfoTableRow* StageInfoRow = StageInfoTable->FindRow<FStageInfoTableRow>
+			(FName(*(FString::FormatAsNumber(Stage))), FString(""));
+
+		TileGenerator->SetSpawnTileIdxRange((*StageInfoRow).MinTileIdx_Straight, (*StageInfoRow).MaxTileIdx_Straight
+			, (*StageInfoRow).MinTileIdx_Curve, (*StageInfoRow).MaxTileIdx_Curve);
+
+		MainCharacter = Cast<AMainCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+		MainCharacter->SetWalkSpeedLimit((*StageInfoRow).MinPlayerSpeed, (*StageInfoRow).MaxPlayerSpeed);
+	}
+
+	return true;
 }
