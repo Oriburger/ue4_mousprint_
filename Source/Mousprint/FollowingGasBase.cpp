@@ -39,7 +39,8 @@ void AFollowingGasBase::BeginPlay()
 	SpawnDefaultController();
 	PathFindingCollision->SetRelativeScale3D(FVector(100.0f, 100.0f, 100.0f));
 
-	//LaunchCharacter(GetActorRotation().Vector().UpVector * -5, false, false);
+	//LaunchCharacter(GetActorRotation().Vector().UpVector * -1, true, false);
+	
 }
 
 // Called every frame
@@ -55,6 +56,8 @@ void AFollowingGasBase::Tick(float DeltaTime)
 		this->SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), ToTargetRotation, 0.1f, true).Quaternion());
 		AddMovementInput(ToTargetRotation.Vector(), 1.0f);
 	}
+	else AddMovementInput(GetActorRotation().Vector(), 0.25f);
+
 
 	GetCharacterMovement()->MaxFlySpeed = GetCharacterMovement()->MaxFlySpeed + (DeltaTime * 5.0f);
 }
