@@ -80,7 +80,8 @@ bool ATileBasic::IsOverlapped() const {	return OverlapFlag; }
 void ATileBasic::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor
 	, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (!OtherActor->ActorHasTag(TEXT("Player"))) return; //오버랩된 액터가 플레이어가 아니면 return;
+	//오버랩된 액터가 플레이어가 아니면 return;
+	if (!OtherActor->ActorHasTag(TEXT("Player")) && !OtherComp->ComponentHasTag(TEXT("Ragdoll"))) return;
 	OverlapFlag = true;
 }
 

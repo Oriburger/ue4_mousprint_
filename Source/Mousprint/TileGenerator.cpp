@@ -30,24 +30,23 @@ void ATileGenerator::Tick(float DeltaTime)
 	if (SpawnedTileArr.Num() <= MaxSpawnTileCnt && !bIsSpawningTile)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("TileGenerator : Tick!"));
-		bIsSpawningTile = true; //중복 스폰 방지
+		//bIsSpawningTile = true; //중복 스폰 방지
 
 		ATileBasic* SpawnedTile = nullptr;
 		int32 nextTileIdx = GetNextSpawnTileIdx();  
 	
-		//UE_LOG(LogTemp, Warning, TEXT("TileGenerator : next tile idx is %d"), nextTileIdx);
+		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : next tile idx is %d"), nextTileIdx);
 
 		if (nextTileIdx != -1 && TileClassArray.IsValidIndex(nextTileIdx))
 		{
 			SpawnedTile = SpawnTile(TileClassArray[nextTileIdx]);
 			if(SpawnedTile != nullptr)	SpawnedTileArr.Push(SpawnedTile);//Spawn 된 타일을 Arr에 넣음
 		}
-
-		bIsSpawningTile = false;
+		//bIsSpawningTile = false;
 	}
 
-	if (SpawnedTileArr.IsValidIndex(10) //플레이어가 2번째 타일의 오버랩 볼륨에 닿았다면
-		&& SpawnedTileArr[10]->IsOverlapped())
+	if ((SpawnedTileArr.IsValidIndex(10) && SpawnedTileArr[10]->IsOverlapped()) //플레이어가 10번째 타일의 오버랩 볼륨에 닿았다면
+		|| (SpawnedTileArr.IsValidIndex(11) && SpawnedTileArr[11]->IsOverlapped()))
 	{
 		ATileBasic* DestoyTarget = SpawnedTileArr[0];
 		if (DestoyTarget != nullptr && IsValid(DestoyTarget))
@@ -73,10 +72,20 @@ int32 ATileGenerator::GetNextSpawnTileIdx()
 	/*--- 다음 스폰할 타일의 Idx와 유형을 무작위로 선택 ---*/
 	bool nextTileType = (FMath::RandRange(0, 100) < CurveTileSpawnPercentage);
 
-	if (nextTileType) nextTileIdx = FMath::RandRange(CurveTileMinIdx, CurveTileMaxIdx);
-	else nextTileIdx = FMath::RandRange(StraightTileMinIdx, StraightTileMaxIdx); //맨 시작 타일은 제외
-
-//	if (nextTileType == prevTileType && nextTileIdx == prevTileIdx) return -1;
+	if (nextTileType)
+	{
+		do
+		{
+			nextTileIdx = FMath::RandRange(CurveTileMinIdx, CurveTileMaxIdx); //맨 시작 타일은 제외
+		} while (prevTileType == nextTileType && prevTileIdx == nextTileIdx);
+	}
+	else
+	{
+		do
+		{
+			nextTileIdx = FMath::RandRange(StraightTileMinIdx, StraightTileMaxIdx); //맨 시작 타일은 제외
+		} while (prevTileType == nextTileType && prevTileIdx == nextTileIdx);
+	}
 
 	/*--- 곡선 타일로 인해 타일들이 겹치는 현상 방지 ---*/
 	if (nextTileType)

@@ -84,6 +84,8 @@ void AMainCharacter::Tick(float DeltaTime)
 	//MoveForward(1);
 
 	CharacterCurrHP = FMath::Min(CharacterMaxHP, CharacterCurrHP + DeltaTime);
+
+	CharacterWalkSpeed = FMath::Max(CharacterMinWalkSpeed, CharacterWalkSpeed);
 	CharacterWalkSpeed = FMath::Min(CharacterMaxWalkSpeed, CharacterWalkSpeed + DeltaTime * 10.0f);
 
 	if (!GetPlayerIsAiming() && !GetCharacterMovement()->IsCrouching())

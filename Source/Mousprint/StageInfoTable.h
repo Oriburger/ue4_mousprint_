@@ -17,7 +17,7 @@ public:
 		int32 Stage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		float StartTime;
+		float EndTime;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		int32 MinTileIdx_Straight;

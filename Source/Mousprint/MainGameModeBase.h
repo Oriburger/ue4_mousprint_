@@ -14,6 +14,10 @@ UCLASS()
 class MOUSPRINT_API AMainGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+private:
+	bool bIsGameStarted = false;
+	float DeltaTimeSum = 0;
+	float StageEndTime = 0;
 
 public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite)
@@ -37,6 +41,9 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+		float SetStage(const int32 stage_);
 
 	UFUNCTION(BlueprintCallable)
 		bool GameStart();
