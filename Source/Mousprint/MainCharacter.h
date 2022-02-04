@@ -30,6 +30,9 @@ public:
 		UGameplayStatics* GameStatic;
 
 	UPROPERTY(EditAnywhere, Category = Sound)
+		USoundWave* HitSound; //데미지 사운드
+
+	UPROPERTY(EditAnywhere, Category = Sound)
 		USoundWave* ShootSound; //총기 발사 사운드
 
 public:

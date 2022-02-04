@@ -283,8 +283,10 @@ float AMainCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damage
 	float FinalDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
 	//UE_LOG(LogTemp, Warning, TEXT("Take Damage"));
-
 	if(bIsInGame && !GetPlayerIsGettingUp() && !bIsDead) PlayAnimMontage(HitAnimMontage, 1.5f);
+
+	GameStatic->PlaySoundAtLocation(GetWorld(), HitSound, this->GetActorLocation()
+									, this->GetActorRotation(), 1.0f);
 
 	CharacterCurrHP = FMath::Max(0.0f, CharacterCurrHP-Damage);
 	if (CharacterCurrHP == 0) Die();
