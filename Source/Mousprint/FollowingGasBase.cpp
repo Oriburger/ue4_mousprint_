@@ -95,6 +95,9 @@ void AFollowingGasBase::PlayerBeginOverlap(UPrimitiveComponent* HitComp, AActor*
 
 	UE_LOG(LogTemp, Warning, TEXT("Overlap"));
 
-	UGameplayStatics::ApplyRadialDamage(GetWorld(), 1000.0f, DamageCollision->GetComponentLocation(),
-			10000.0f, UDamageType::StaticClass(), {}, this, nullptr);
+	UGameplayStatics::ApplyPointDamage(OtherActor, 1000.0f, OtherActor->GetActorLocation(),
+		SweepResult, nullptr, this, nullptr);
+	/*
+	UGameplayStatics::ApplyPointDamage(GetWorld(), 1000.0f, DamageCollision->GetComponentLocation(),
+			10000.0f, UDamageType::StaticClass(), {}, this, nullptr);*/
 }
