@@ -57,7 +57,7 @@ FTransform ATileBasic::GetNextSpawnPoint() const
 
 bool ATileBasic::InitObstacle()
 {
-	if (!GetWorld() || ObstacleClassArray.Num() == 0 || ObstacleSpawnPointArray.Num() == 0) return false;
+	if (!GetWorld() || ObstacleClassArray.Num() == 0 || ObstacleSpawnPointArray.Num() == 0)	return false;
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this; //타일의 소유자는 Generator

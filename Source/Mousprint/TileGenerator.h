@@ -15,7 +15,7 @@ class MOUSPRINT_API ATileGenerator : public AActor
 
 private:
 	TArray<ATileBasic*> SpawnedTileArr; //스폰된 타일의 주소를 저장하는 배열
-	int32 Stage = 1;
+	int32 Stage = 0;
 	int32 StraightTileMinIdx = 0; //스폰할 타일 액터의 시작 Idx
 	int32 StraightTileMaxIdx = 0; //스폰할 타일 액터의 끝 Idx
 	int32 CurveTileMinIdx = 0; //스폰할 타일 액터의 시작 Idx

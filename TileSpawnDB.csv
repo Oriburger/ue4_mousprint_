@@ -1,4 +1,5 @@
-Name,Stage,BP_FileName,TotalObstacleCount,MaxSpawnObstacleCount,bIsCurve
+Name,
+,BP_FileName,TotalObstacleCount,MaxSpawnObstacleCount,bIsCurve
 0,1,BP_Tile_Straight_1-01,5,4,0
 1,1,BP_Tile_Curved_Left_1-01,,,1
 2,1,BP_Tile_Curved_Right_1-01,,,1

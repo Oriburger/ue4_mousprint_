@@ -15,7 +15,7 @@ AObstacleBase::AObstacleBase()
 	SetRootComponent(DefaultSceneRoot); //루트 컴포넌트화
 
 	//Obstacle Child Actor Component 초기화
-	for (int idx = 0; idx < UseObstacleCount; idx++)
+	for (int idx = 0; idx < MaxObstacleCnt; idx++)
 	{
 		FName ObstacleName = FName("OBSTACLE_" + FString::FromInt(idx));
 		ObstacleComponentArray.Add(CreateDefaultSubobject<UChildActorComponent>(ObstacleName));
@@ -24,7 +24,7 @@ AObstacleBase::AObstacleBase()
 		bIsArrived.Add(false);
 	}
 	//Obstacle Path Component 초기화
-	for (int idx = 0; idx < UseObstacleCount * 2; idx++)
+	for (int idx = 0; idx < MaxObstacleCnt * 2; idx++)
 	{
 		FName ObstacleName = FName("Path_" + FString::FromInt(idx/2) + "_" + FString::FromInt(idx % 2));
 		PathComponentArray.Add(CreateDefaultSubobject<USphereComponent>(ObstacleName));
