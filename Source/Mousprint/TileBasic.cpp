@@ -89,11 +89,11 @@ void ATileBasic::DestroyObstacle()
 {
 	//스폰한 장애물들을 전부 반환
 
-	UE_LOG(LogTemp, Warning, TEXT("TileBasic : DestroyObstacle()-----"));
+	//UE_LOG(LogTemp, Warning, TEXT("TileBasic : DestroyObstacle()-----"));
 
 	if (SpawnedObstacleArr.Num() == 0) return;
 
-	UE_LOG(LogTemp, Warning, TEXT("TileBasic : Obstacle Total Count = %d"), SpawnedObstacleArr.Num());
+	//UE_LOG(LogTemp, Warning, TEXT("TileBasic : Obstacle Total Count = %d"), SpawnedObstacleArr.Num());
 
 	for(int idx = SpawnedObstacleArr.Num()-1; idx>=0; idx--)
 	{
@@ -102,6 +102,6 @@ void ATileBasic::DestroyObstacle()
 		if (DestroyTarget != nullptr && IsValid(DestroyTarget)) DestroyTarget->Destroy();
 		SpawnedObstacleArr.RemoveAt(idx);
 
-		UE_LOG(LogTemp, Warning, TEXT("TileBasic : Removed Obstacle #%d"), idx);
+		//UE_LOG(LogTemp, Warning, TEXT("TileBasic : Removed Obstacle #%d"), idx);
 	}
 }

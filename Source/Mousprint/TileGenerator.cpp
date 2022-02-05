@@ -35,7 +35,7 @@ void ATileGenerator::Tick(float DeltaTime)
 		ATileBasic* SpawnedTile = nullptr;
 		int32 nextTileIdx = GetNextSpawnTileIdx();  
 	
-		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : next tile idx is %d"), nextTileIdx);
+		//UE_LOG(LogTemp, Warning, TEXT("TileGenerator : next tile idx is %d"), nextTileIdx);
 
 		if (nextTileIdx != -1 && TileClassArray.IsValidIndex(nextTileIdx))
 		{
@@ -51,7 +51,7 @@ void ATileGenerator::Tick(float DeltaTime)
 		ATileBasic* DestoyTarget = SpawnedTileArr[0];
 		if (DestoyTarget != nullptr && IsValid(DestoyTarget))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("TileGenerator : Tile Removed"));
+			//UE_LOG(LogTemp, Warning, TEXT("TileGenerator : Tile Removed"));
 			DestoyTarget->DestroyObstacle();
 			DestoyTarget->Destroy();  //0번째 타일을 Destroy
 		}

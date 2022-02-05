@@ -24,16 +24,16 @@ public:
 	UPROPERTY(EditAnywhere, Category = Sound)
 		USoundCue* HitSound; //피격 사운드
 
-	UPROPERTY(VisibleDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		USceneComponent* DefaultSceneRoot;
 
-	UPROPERTY(VisibleDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UArrowComponent* ArrowComponent; //레이저 발사 방향
 
-	UPROPERTY(EditAnywhere, Category = "Niagara")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara")
 		UNiagaraComponent* NELaserComponent;
 
-	UPROPERTY(EditAnywhere, Category = "Niagara")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara")
 		UNiagaraComponent* NELaserImpactComponent;
 
 protected:
