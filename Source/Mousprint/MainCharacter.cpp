@@ -348,12 +348,16 @@ bool AMainCharacter::SpawnPathActor(const float DeltaTime)
 void AMainCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor
 	, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (!GetWorld() || OtherActor == nullptr) return;
-
-	if (OtherActor->ActorHasTag("Obstacle"))
+	if (!GetWorld() || OtherActor == nullptr || OtherComp == nullptr) return;
+	if (OtherComp->GetCollisionProfileName() == FName("Obstacle"))
 	{
 		SetPlayerRagdoll(true);
 		bIsRagdoll = true;
 		DisableRagdollDelay = 1.5f;
+	}
+
+	if (OtherActor->ActorHasTag("Obstacle"))
+	{
+		
 	}
 }
