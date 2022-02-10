@@ -39,7 +39,7 @@ public:
 	// Sets default values for this character's properties
 	AMainCharacter();
 
-	/* ----- Charater State ----- */
+	/* ----- Charater State + Tutorial ----- */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
 		float CharacterMaxHP = 100;
 
@@ -54,6 +54,19 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
 		float CharacterWalkSpeed = 1000; //플레이어의 이동 속도
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TutorialOnly)
+		bool bCanMove = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TutorialOnly)
+		bool bCanJump = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TutorialOnly)
+		bool bCanSlide = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TutorialOnly)
+		bool bCanAim = true;
+
 
 	/* ----- Basic Component ----- */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)

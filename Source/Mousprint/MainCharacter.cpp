@@ -126,7 +126,7 @@ bool AMainCharacter::GetPlayerIsGettingUp() const { return GettingUpTimeDelay > 
 
 void AMainCharacter::MoveForward(float Value)
 {
-	if (!GetWorld() || bIsDead || bIsRagdoll) return;
+	if (!GetWorld() || bIsDead || bIsRagdoll || !bCanMove) return;
 	//현재 Controller의 X 방향으로 Value 만큼 이동
 	FVector Direction = FRotationMatrix(this->GetActorRotation()).GetScaledAxis(EAxis::X);
 	if (abs(Value) > 0) this->SetActorRotation({0, Controller->GetControlRotation().Yaw, 0});
@@ -135,7 +135,7 @@ void AMainCharacter::MoveForward(float Value)
 
 void AMainCharacter::MoveRight(float Value)
 {
-	if (!GetWorld() || bIsDead || bIsRagdoll) return;
+	if (!GetWorld() || bIsDead || bIsRagdoll || !bCanMove) return;
 	//현재 Controller의 Y 방향으로 Value 만큼 이동
 	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
 	if (abs(Value) > 0) this->SetActorRotation({ 0, Controller->GetControlRotation().Yaw, 0 });
@@ -190,7 +190,7 @@ void AMainCharacter::Fire()
 
 void AMainCharacter::Aim()
 {
-	if (bIsDead || bIsRagdoll) return;
+	if (bIsDead || bIsRagdoll || !bCanAim) return;
 	if (GetCharacterMovement()->IsCrouching()) return;
 	//UE_LOG(LogTemp, Warning, TEXT("Aim"));
 
@@ -220,7 +220,7 @@ void AMainCharacter::StopAim()
 
 void AMainCharacter::StartSlide()
 {
-	if (GetCharacterMovement()->IsCrouching() || bIsDead || bIsRagdoll) return;
+	if (GetCharacterMovement()->IsCrouching() || bIsDead || bIsRagdoll || !bCanSlide) return;
 
 	StopJump();
 	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterWalkSpeed;
@@ -248,7 +248,7 @@ void AMainCharacter::TryStopSlide(const float DeltaTime, const bool force)
 void AMainCharacter::StartRush()
 {
 	if (bIsDead || bIsAimed || bIsRagdoll || !bIsInGame || GetPlayerIsGettingUp()) return;	
-	if (GetCharacterMovement()->IsFalling()) return;
+	if (!bCanJump || GetCharacterMovement()->IsFalling()) return;
 
 	GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
 	LaunchCharacter({ 0.0f, 0.0f, 350.0f }, false, true);
@@ -264,7 +264,8 @@ void AMainCharacter::StartRush()
 
 void AMainCharacter::StartJump()
 {
-	if (GetCharacterMovement()->IsFalling() || bIsDead || GetPlayerIsGettingUp()) return;
+	if (GetCharacterMovement()->IsFalling() || bIsDead) return;
+	if (!bCanJump|| GetPlayerIsGettingUp()) return;
 	TryStopSlide(0, true);
 	ACharacter::Jump();
 }
