@@ -25,6 +25,12 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Collision)
 		USphereComponent* DamageCollision;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Gameplay)
+		float CharacterMoveSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Gameplay)
+		float CharacterMaxMoveSpeed;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -37,6 +43,18 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
+		void CheckPathAndUpdateLocation();
+
+	UFUNCTION()
+		void UpdateCharacterSpeed(const float DeltaTime);
+
+	UFUNCTION()
+		void SetMoveSpeedLimit(const float MinValue, const float MaxValue);
+
+	UFUNCTION(BlueprintCallable)
+		float GetCurrentSpeed() const;
+
+	UFUNCTION()
 		void PathBeginOverlap(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp
 			, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -47,4 +65,6 @@ public:
 	UFUNCTION()
 		void PlayerBeginOverlap(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp
 			, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	
 };

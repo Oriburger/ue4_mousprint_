@@ -29,28 +29,35 @@ void ATileGenerator::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	
+	SpawnNextTile();
+	DestroyHeadTile();
+}
+
+void ATileGenerator::SpawnNextTile()
+{
 	//스폰 된 타일의 수가 MaxSpawnTileCnt보다 작고, 스폰 작업 중이 아니라면
 	if (SpawnedTileArr.Num() <= MaxSpawnTileCnt)// && !bIsSpawningTile)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("TileGenerator : Tick!"));
+		//UE_LOG(LogTemp, Warning, TEXT("TileGenerator : Tick!"));
 		//bIsSpawningTile = true; //중복 스폰 방지
-		
+
 		ATileBasic* SpawnedTile = nullptr;
-		int32 nextTileIdx = GetNextSpawnTileIdx();  
-	
+		int32 nextTileIdx = GetNextSpawnTileIdx();
+
 		//UE_LOG(LogTemp, Warning, TEXT("TileGenerator : next tile idx is %d"), nextTileIdx);
 
 		if (TileClassArray.IsValidIndex(nextTileIdx))
 		{
 			SpawnedTile = SpawnTile(TileClassArray[nextTileIdx]);
-			if(SpawnedTile != nullptr)	SpawnedTileArr.Push(SpawnedTile);//Spawn 된 타일을 Arr에 넣음
+			if (SpawnedTile != nullptr)	SpawnedTileArr.Push(SpawnedTile);//Spawn 된 타일을 Arr에 넣음
 
 		//	UE_LOG(LogTemp, Warning, TEXT("TileGenerator : %d Tile Pushed"), nextTileIdx);
 		}
-		//bIsSpawningTile = false;
 	}
-	
+}
+
+void ATileGenerator::DestroyHeadTile()
+{
 	if ((SpawnedTileArr.IsValidIndex(10) && SpawnedTileArr[10]->IsOverlapped()) //플레이어가 10번째 타일의 오버랩 볼륨에 닿았다면
 		|| (SpawnedTileArr.IsValidIndex(11) && SpawnedTileArr[11]->IsOverlapped()))
 	{

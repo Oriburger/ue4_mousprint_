@@ -56,8 +56,7 @@ FHitResult ALaserBase::UpdateLaserEndLocation()
 	//LineTrace를 통해 레이저의 끝위치와 Impact위치 지정
 	if (LineTraceHitResult.Actor.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("LaserBase : %.1lf, %.1lf, %.1lf"), LineTraceHitResult.Location.X, LineTraceHitResult.Location.Y,
-																		LineTraceHitResult.Location.Z);
+		//UE_LOG(LogTemp, Warning, TEXT("LaserBase : %.1lf, %.1lf, %.1lf"), LineTraceHitResult.Location.X, LineTraceHitResult.Location.Y, LineTraceHitResult.Location.Z);
 		NELaserComponent->SetVectorParameter("LaserEnd", LineTraceHitResult.Location);
 		NELaserImpactComponent->SetWorldLocation(LineTraceHitResult.Location);
 	}

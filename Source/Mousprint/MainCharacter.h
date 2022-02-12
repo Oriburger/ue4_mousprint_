@@ -154,6 +154,13 @@ public:
 		void StopJump();
 
 	/* --- Etc ---- */
+
+	UFUNCTION()
+		void UpdateRagdollState(const float DeltaTime);
+
+	UFUNCTION()
+		void UpdateCharacterSpeed(const float DeltaTime);
+
 	UFUNCTION()
 		virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent
 							, AController* EventInstigator, AActor * DamageCauser) override;

@@ -38,9 +38,6 @@ void AFollowingGasBase::BeginPlay()
 
 	SpawnDefaultController();
 	PathFindingCollision->SetRelativeScale3D(FVector(100.0f, 100.0f, 100.0f));
-
-	//LaunchCharacter(GetActorRotation().Vector().UpVector * -1, true, false);
-	
 }
 
 // Called every frame
@@ -48,18 +45,8 @@ void AFollowingGasBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (PathList.Num() > 0)
-	{
-		AActor* Target = PathList[PathList.Num()-1];
-		FRotator ToTargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation()
-									, Target->GetActorLocation());		
-		this->SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), ToTargetRotation, 0.1f, true).Quaternion());
-		AddMovementInput(ToTargetRotation.Vector(), 1.0f);
-	}
-	else AddMovementInput(GetActorRotation().Vector(), 0.25f);
-
-
-	GetCharacterMovement()->MaxFlySpeed = GetCharacterMovement()->MaxFlySpeed + (DeltaTime * 5.0f);
+	CheckPathAndUpdateLocation();
+	UpdateCharacterSpeed(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -68,6 +55,33 @@ void AFollowingGasBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+void AFollowingGasBase::CheckPathAndUpdateLocation()
+{
+	if (PathList.Num() > 0)
+	{
+		AActor* Target = PathList[PathList.Num() - 1];
+		FRotator ToTargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation()
+			, Target->GetActorLocation());
+		this->SetActorRotation(UKismetMathLibrary::RLerp(GetActorRotation(), ToTargetRotation, 0.1f, true).Quaternion());
+		AddMovementInput(ToTargetRotation.Vector(), 1.0f);
+	}
+	else AddMovementInput(GetActorRotation().Vector(), 0.25f);
+}
+
+void AFollowingGasBase::UpdateCharacterSpeed(const float DeltaTime)
+{
+	CharacterMoveSpeed = FMath::Min(CharacterMaxMoveSpeed, CharacterMoveSpeed + DeltaTime * 7.5f);
+	GetCharacterMovement()->MaxFlySpeed = CharacterMoveSpeed;
+}
+
+void AFollowingGasBase::SetMoveSpeedLimit(const float MinValue, const float MaxValue)
+{
+	CharacterMoveSpeed = MinValue;
+	CharacterMaxMoveSpeed = MaxValue;
+}
+
+float AFollowingGasBase::GetCurrentSpeed() const { return GetCharacterMovement()->MaxFlySpeed; }
 
 void AFollowingGasBase::PathBeginOverlap(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp
 									, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

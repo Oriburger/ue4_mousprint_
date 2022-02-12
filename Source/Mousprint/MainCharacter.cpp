@@ -65,34 +65,10 @@ void AMainCharacter::Tick(float DeltaTime)
 	TryStopSlide(DeltaTime); //Slide 중이라면, 일정 시간 이후 자동으로 Slide를 멈춤
 	SpawnPathActor(DeltaTime); //일정 Tick 간격으로 PathActor를 스폰
 
-	//Ragdoll 관련 로직
-	if (DisableRagdollDelay > 0) //Ragdoll 상태가 되고, 다시 풀릴때까지의 딜레이
-	{
-		DisableRagdollDelay = FMath::Max(0.0f, DisableRagdollDelay - DeltaTime);
-		if (DisableRagdollDelay == 0) SetPlayerRagdoll(false); 
-	}
-	else if (GettingUpTimeDelay > 0) //GettingUp AnimMontage이 실행되는 동안, bIsRagdoll 값 갱신을 딜레이
-	{
-		GettingUpTimeDelay = FMath::Max(0.0f, GettingUpTimeDelay - DeltaTime);
-		if (GettingUpTimeDelay == 0)
-		{
-			bIsRagdoll = false;
-			CharacterWalkSpeed = FMath::Max(CharacterMinWalkSpeed, CharacterWalkSpeed * 90 / 100);
-		}
-	}
+	UpdateRagdollState(DeltaTime);
+	UpdateCharacterSpeed(DeltaTime);
 
 	//MoveForward(1);
-
-	CharacterCurrHP = FMath::Min(CharacterMaxHP, CharacterCurrHP + DeltaTime);
-
-	CharacterWalkSpeed = FMath::Max(CharacterMinWalkSpeed, CharacterWalkSpeed);
-	CharacterWalkSpeed = FMath::Min(CharacterMaxWalkSpeed, CharacterWalkSpeed + DeltaTime * 10.0f);
-
-	if (!GetPlayerIsAiming() && !GetCharacterMovement()->IsCrouching())
-	{
-		GetCharacterMovement()->MaxWalkSpeed = CharacterWalkSpeed;
-		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterWalkSpeed * 0.75;
-	}
 }
 
 // Called to bind functionality to input
@@ -276,6 +252,37 @@ void AMainCharacter::StopJump()
 
 	StopJumping();
 	LaunchCharacter({ 0.0f, 0.0f, -500.0f }, false, true);
+}
+
+void AMainCharacter::UpdateRagdollState(const float DeltaTime)
+{
+	//Ragdoll 관련 로직
+	if (DisableRagdollDelay > 0) //Ragdoll 상태가 되고, 다시 풀릴때까지의 딜레이
+	{
+		DisableRagdollDelay = FMath::Max(0.0f, DisableRagdollDelay - DeltaTime);
+		if (DisableRagdollDelay == 0) SetPlayerRagdoll(false);
+	}
+	else if (GettingUpTimeDelay > 0) //GettingUp AnimMontage이 실행되는 동안, bIsRagdoll 값 갱신을 딜레이
+	{
+		GettingUpTimeDelay = FMath::Max(0.0f, GettingUpTimeDelay - DeltaTime);
+		if (GettingUpTimeDelay == 0)
+		{
+			bIsRagdoll = false;
+			CharacterWalkSpeed = FMath::Max(CharacterMinWalkSpeed, CharacterWalkSpeed * 90 / 100);
+		}
+	}
+}
+
+void AMainCharacter::UpdateCharacterSpeed(const float DeltaTime)
+{
+	CharacterWalkSpeed = FMath::Max(CharacterMinWalkSpeed, CharacterWalkSpeed);
+	CharacterWalkSpeed = FMath::Min(CharacterMaxWalkSpeed, CharacterWalkSpeed + DeltaTime * 10.0f);
+
+	if (!GetPlayerIsAiming() && !GetCharacterMovement()->IsCrouching())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = CharacterWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterWalkSpeed * 0.75;
+	}
 }
 
 float AMainCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent

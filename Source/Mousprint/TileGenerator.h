@@ -53,6 +53,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
+		void SpawnNextTile();
+
+	UFUNCTION()
+		void DestroyHeadTile();
+
+	UFUNCTION()
 		FTransform GetNextSpawnTransform() const; //다음 스폰될 타일의 위치를 반환
 
 	UFUNCTION()
