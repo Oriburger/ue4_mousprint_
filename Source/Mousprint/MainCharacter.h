@@ -41,10 +41,10 @@ public:
 
 	/* ----- Charater State + Tutorial ----- */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
-		float CharacterMaxHP = 100;
+		float CharacterMaxHP = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
-		float CharacterCurrHP = 100;
+		float CharacterCurrHP = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = CharacterStat)
 		float CharacterMinWalkSpeed = 1000; //플레이어의 최소 이동 속도 제한 (이 값 이상으로 줄어들지 않음)

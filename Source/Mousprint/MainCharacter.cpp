@@ -363,9 +363,4 @@ void AMainCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor
 		bIsRagdoll = true;
 		DisableRagdollDelay = 1.5f;
 	}
-
-	if (OtherActor->ActorHasTag("Obstacle"))
-	{
-		
-	}
 }

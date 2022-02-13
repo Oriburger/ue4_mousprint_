@@ -18,6 +18,7 @@ class MOUSPRINT_API AMainGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 private:
 	bool bIsGameStarted = false;
+	bool bIsGameOver = false;
 	float DeltaTimeSum = 0;
 	float StageEndTime = 0;
 
@@ -52,6 +53,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
+		void UpdateStageInfo(const float DeltaTime);
+
+	UFUNCTION()
+		void CheckGameOver();
+
+	UFUNCTION()
 		float SetStage(const int32 stage_);
 
 	UFUNCTION(BlueprintCallable)
@@ -59,4 +66,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		float GetDistanceGasToPlayer() const;
+
+	UFUNCTION(BlueprintCallable)
+		bool GetGameIsOver() const;
 };

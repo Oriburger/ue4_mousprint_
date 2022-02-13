@@ -24,6 +24,13 @@ void AMainGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UpdateStageInfo(DeltaTime);
+	CheckGameOver();
+}
+
+void AMainGameModeBase::UpdateStageInfo(const float DeltaTime)
+{
+	if (!bIsGameStarted) return;
 	if (StageEndTime != 0 && !MainCharacter->GetPlayerIsDead())
 	{
 		Score = Score + DeltaTime * 10;
@@ -33,6 +40,17 @@ void AMainGameModeBase::Tick(float DeltaTime)
 		{
 			StageEndTime = SetStage(++Stage);
 		}
+	}
+}
+
+void AMainGameModeBase::CheckGameOver()
+{
+	if (!bIsGameStarted || MainCharacter == nullptr) return;
+
+	if (MainCharacter->GetPlayerIsDead())
+	{
+		bIsGameOver = true;
+		bIsGameStarted = false;
 	}
 }
 
@@ -80,3 +98,5 @@ float AMainGameModeBase::GetDistanceGasToPlayer() const
 
 	return FVector::Distance(MainCharacter->GetActorLocation(), FollowingGas->GetActorLocation()) - 1450.0f;
 }
+
+bool AMainGameModeBase::GetGameIsOver() const { return bIsGameOver;  }
