@@ -73,7 +73,7 @@ float AMainGameModeBase::SetStage(const int32 stage_)
 	return (*StageInfoRow).EndTime;
 }
 
-bool AMainGameModeBase::GameStart()
+bool AMainGameModeBase::InitGame()
 {
 	if (!GetWorld()) return false;
 
@@ -83,12 +83,26 @@ bool AMainGameModeBase::GameStart()
 	SpawnParams.Owner = this; //타일의 소유자는 Generator
 	SpawnParams.Instigator = GetInstigator();
 
-	SpawnTransform.SetLocation({ -7500.0f, 0.0f, 1000.0f });
+	SpawnTransform.SetLocation({ -7600.0f, 0.0f, 2500.0f });
 	TileGenerator = GetWorld()->SpawnActor<ATileGenerator>(TileGeneratorClass, SpawnParams);
 	FollowingGas = GetWorld()->SpawnActor<AFollowingGasBase>(FollowingGasClass, SpawnTransform, SpawnParams);
 	if (TileGenerator == nullptr || FollowingGas == nullptr) return false;
 
+	FollowingGas->SetGasCanMove(true);
+
 	StageEndTime = SetStage(Stage);
+	return true;
+}
+
+bool AMainGameModeBase::GameStart()
+{
+	if (!GetWorld() || MainCharacter == nullptr || FollowingGas == nullptr) return false;
+
+	MainCharacter->bCanMove = true;
+	
+
+	GetWorld()->GetFirstPlayerController()->SetViewTargetWithBlend(MainCharacter);
+
 	return true;
 }
 
@@ -98,5 +112,9 @@ float AMainGameModeBase::GetDistanceGasToPlayer() const
 
 	return FVector::Distance(MainCharacter->GetActorLocation(), FollowingGas->GetActorLocation()) - 1450.0f;
 }
+
+bool AMainGameModeBase::GetTutorialIsEnd() const { return bIsTutorialEnd;  }
+
+void AMainGameModeBase::SetIsTutorialEnd(const bool flag) { bIsTutorialEnd = flag; }
 
 bool AMainGameModeBase::GetGameIsOver() const { return bIsGameOver;  }

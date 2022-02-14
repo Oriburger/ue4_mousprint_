@@ -56,7 +56,7 @@ public:
 		float CharacterWalkSpeed = 1000; //플레이어의 이동 속도
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TutorialOnly)
-		bool bCanMove = true;
+		bool bCanMove = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TutorialOnly)
 		bool bCanJump = true;

@@ -19,6 +19,7 @@ class MOUSPRINT_API AMainGameModeBase : public AGameModeBase
 private:
 	bool bIsGameStarted = false;
 	bool bIsGameOver = false;
+	bool bIsTutorialEnd = false; 
 	float DeltaTimeSum = 0;
 	float StageEndTime = 0;
 
@@ -62,10 +63,19 @@ public:
 		float SetStage(const int32 stage_);
 
 	UFUNCTION(BlueprintCallable)
+		bool InitGame();
+
+	UFUNCTION(BlueprintCallable)
 		bool GameStart();
 
 	UFUNCTION(BlueprintCallable)
 		float GetDistanceGasToPlayer() const;
+
+	UFUNCTION(BlueprintCallable)
+		bool GetTutorialIsEnd() const;
+
+	UFUNCTION(BlueprintCallable)
+		void SetIsTutorialEnd(const bool flag);
 
 	UFUNCTION(BlueprintCallable)
 		bool GetGameIsOver() const;

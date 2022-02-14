@@ -58,6 +58,7 @@ void AFollowingGasBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AFollowingGasBase::CheckPathAndUpdateLocation()
 {
+	if (!bCanMove) return;
 	if (PathList.Num() > 0)
 	{
 		AActor* Target = PathList[PathList.Num() - 1];
@@ -71,6 +72,7 @@ void AFollowingGasBase::CheckPathAndUpdateLocation()
 
 void AFollowingGasBase::UpdateCharacterSpeed(const float DeltaTime)
 {
+	if (!bCanMove) return;
 	CharacterMoveSpeed = FMath::Min(CharacterMaxMoveSpeed, CharacterMoveSpeed + DeltaTime * 7.5f);
 	GetCharacterMovement()->MaxFlySpeed = CharacterMoveSpeed;
 }
@@ -115,3 +117,5 @@ void AFollowingGasBase::PlayerBeginOverlap(UPrimitiveComponent* HitComp, AActor*
 	UGameplayStatics::ApplyPointDamage(GetWorld(), 1000.0f, DamageCollision->GetComponentLocation(),
 			10000.0f, UDamageType::StaticClass(), {}, this, nullptr);*/
 }
+
+void AFollowingGasBase::SetGasCanMove(const bool flag) { bCanMove = flag; }
