@@ -2,6 +2,8 @@
 
 
 #include "MainGameModeBase.h"
+#include "SaveInfo.h"
+#include "Kismet/GameplayStatics.h"
 #include "StageInfoTable.h"
 
 // Sets default values
@@ -9,6 +11,11 @@ AMainGameModeBase::AMainGameModeBase()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	USaveInfo* LoadGameInstance = Cast<USaveInfo>(UGameplayStatics::CreateSaveGameObject(USaveInfo::StaticClass()));
+	LoadGameInstance = Cast<USaveInfo>(UGameplayStatics::LoadGameFromSlot(LoadGameInstance->SaveSlotName, LoadGameInstance->UserIndex));
+	if (LoadGameInstance != nullptr)
+		bIsTutorialEnd = LoadGameInstance->bIsTutorialEnd;
 }
 
 // Called when the game starts or when spawned
@@ -36,10 +43,7 @@ void AMainGameModeBase::UpdateStageInfo(const float DeltaTime)
 		Score = Score + DeltaTime * 10;
 		DeltaTimeSum += DeltaTime;
 
-		if (DeltaTimeSum >= StageEndTime)
-		{
-			StageEndTime = SetStage(++Stage);
-		}
+		if (DeltaTimeSum >= StageEndTime) StageEndTime = SetStage(++Stage);
 	}
 }
 
@@ -73,9 +77,14 @@ float AMainGameModeBase::SetStage(const int32 stage_)
 	return (*StageInfoRow).EndTime;
 }
 
-bool AMainGameModeBase::InitGame()
+bool AMainGameModeBase::GameInit()
 {
 	if (!GetWorld()) return false;
+
+	USaveInfo* SaveGameInstance = Cast<USaveInfo>(UGameplayStatics::CreateSaveGameObject(USaveInfo::StaticClass()));
+	SaveGameInstance->bIsTutorialEnd = true;
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex);
+
 
 	bIsGameStarted = true;
 	FActorSpawnParameters SpawnParams;

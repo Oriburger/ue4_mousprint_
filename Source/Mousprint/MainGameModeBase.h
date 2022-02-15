@@ -63,7 +63,7 @@ public:
 		float SetStage(const int32 stage_);
 
 	UFUNCTION(BlueprintCallable)
-		bool InitGame();
+		bool GameInit();
 
 	UFUNCTION(BlueprintCallable)
 		bool GameStart();
