@@ -20,7 +20,7 @@ public:
 		bool bIsTutorialEnd = false;
 
 	UPROPERTY(VisibleAnywhere, Category = Gameplay)
-		FString SaveSlotName;
+		FString SaveSlotName = "Default";
 
 	UPROPERTY(VisibleAnywhere, Category = Gameplay)
 		uint32 UserIndex = 0; 

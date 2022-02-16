@@ -15,7 +15,14 @@ AMainGameModeBase::AMainGameModeBase()
 	USaveInfo* LoadGameInstance = Cast<USaveInfo>(UGameplayStatics::CreateSaveGameObject(USaveInfo::StaticClass()));
 	LoadGameInstance = Cast<USaveInfo>(UGameplayStatics::LoadGameFromSlot(LoadGameInstance->SaveSlotName, LoadGameInstance->UserIndex));
 	if (LoadGameInstance != nullptr)
+	{
 		bIsTutorialEnd = LoadGameInstance->bIsTutorialEnd;
+		UE_LOG(LogTemp, Warning, TEXT("Game Load"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Save Data Not Found"));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -84,7 +91,7 @@ bool AMainGameModeBase::GameInit()
 	USaveInfo* SaveGameInstance = Cast<USaveInfo>(UGameplayStatics::CreateSaveGameObject(USaveInfo::StaticClass()));
 	SaveGameInstance->bIsTutorialEnd = true;
 	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex);
-
+	UE_LOG(LogTemp, Warning, TEXT("Data Saved"));
 
 	bIsGameStarted = true;
 	FActorSpawnParameters SpawnParams;

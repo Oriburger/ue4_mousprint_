@@ -17,13 +17,6 @@ ALaserBase::ALaserBase()
 	ArrowComponent->SetupAttachment(RootComponent);
 	ArrowComponent->ArrowSize = 1.0f;
 	
-	//NELaserComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("LASER"));
-	//NELaserComponent->SetupAttachment(RootComponent);
-	//NELaserComponent->SetColorParameter("Color", FLinearColor(0.0f, 1.0f, 0.1f, 0.5f));
-
-	//NELaserImpactComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("LASER_IMPACT"));
-	//NELaserImpactComponent->SetupAttachment(RootComponent);
-	//NELaserImpactComponent->SetColorParameter("Color", FLinearColor(0.0f, 1.0f, 0.1f, 0.1f));
 }
 
 // Called when the game starts or when spawned
@@ -38,7 +31,7 @@ void ALaserBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	UpdateDamageDelay(DeltaTime);
-	CheckHitAndApplyDamage(GetLineTraceEndLocation());//UpdateLaserEndLocation());
+	CheckHitAndApplyDamage(GetLineTraceEndLocation());
 }
 
 FHitResult ALaserBase::GetLineTraceEndLocation()
@@ -55,34 +48,7 @@ FHitResult ALaserBase::GetLineTraceEndLocation()
 	
 	return LineTraceHitResult;
 }
-/*
-FHitResult ALaserBase::UpdateLaserEndLocation()
-{
-	FHitResult LineTraceHitResult; //LineTracing의 결과가 담길 변수
-	FVector TraceBeginLocation = this->GetActorLocation();
-	FVector TraceEndLocation = TraceBeginLocation + (ArrowComponent->GetComponentRotation().Vector()) * 10000.0f;
 
-	FCollisionQueryParams TraceCollisionQuery = FCollisionQueryParams::DefaultQueryParam;
-	TraceCollisionQuery.AddIgnoredActor(this->GetUniqueID());  //플레이어의 카메라가 Hit되지 않도록 방지
-
-	GetWorld()->LineTraceSingleByChannel(LineTraceHitResult, TraceBeginLocation, TraceEndLocation
-		, ECollisionChannel::ECC_Camera, TraceCollisionQuery); //LineTrace 시작
-
-	//LineTrace를 통해 레이저의 끝위치와 Impact위치 지정
-	if (LineTraceHitResult.Actor.IsValid())
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("LaserBase : %.1lf, %.1lf, %.1lf"), LineTraceHitResult.Location.X, LineTraceHitResult.Location.Y, LineTraceHitResult.Location.Z);
-		//NELaserComponent->SetVectorParameter("LaserEnd", LineTraceHitResult.Location);
-		//NELaserImpactComponent->SetWorldLocation(LineTraceHitResult.Location);
-	}
-	else
-	{
-		//NELaserComponent->SetVectorParameter("LaserEnd", TraceEndLocation);
-		//NELaserImpactComponent->SetWorldLocation(TraceEndLocation);
-	}
-	return LineTraceHitResult;
-}
-*/
 void ALaserBase::CheckHitAndApplyDamage(FHitResult OutHit)
 {
 	if (!IsValid(OutHit.GetActor()) || !OutHit.GetActor()->ActorHasTag("Player")) return;

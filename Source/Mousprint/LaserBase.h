@@ -5,7 +5,6 @@
 #include "EngineMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/ArrowComponent.h"
-//#include "NiagaraComponent.h"
 #include "Sound/SoundCue.h"
 #include "LaserBase.generated.h"
 
@@ -30,12 +29,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UArrowComponent* ArrowComponent; //레이저 발사 방향
 
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara")
-	//	UNiagaraComponent* NELaserComponent;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Niagara")
-	//	UNiagaraComponent* NELaserImpactComponent;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -46,9 +39,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		FHitResult GetLineTraceEndLocation();
-
-	//UFUNCTION()
-		//FHitResult UpdateLaserEndLocation();
 
 	UFUNCTION()
 		void CheckHitAndApplyDamage(FHitResult OutHit);

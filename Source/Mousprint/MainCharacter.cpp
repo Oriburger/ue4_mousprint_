@@ -326,7 +326,10 @@ void AMainCharacter::SetPlayerRagdoll(const bool flag)
 	{
 		FAttachmentTransformRules ResetTransform = FAttachmentTransformRules::KeepRelativeTransform; 
 
-		GetCapsuleComponent()->SetWorldLocation(GetMesh()->GetComponentLocation()+FVector(0,0,100), false, nullptr, ETeleportType::TeleportPhysics);
+		FVector NewLocation = { GetActorLocation().X - 200.0f, 0.0f, 100.0f };
+
+		//GetCapsuleComponent()->SetWorldLocation(GetMesh()->GetComponentLocation() + FVector(-50.0f, 0.0f, 100.0f), false, nullptr, ETeleportType::TeleportPhysics);
+		GetCapsuleComponent()->SetWorldLocation(NewLocation, false, nullptr, ETeleportType::TeleportPhysics);
 		GetMesh()->AttachToComponent(GetCapsuleComponent(), ResetTransform);
 		GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -68.0f), false, nullptr, ETeleportType::TeleportPhysics);
 		GetMesh()->SetRelativeRotation({ 0.0f, -90.0f, 0.0f });
