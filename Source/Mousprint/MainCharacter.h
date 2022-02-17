@@ -6,6 +6,7 @@
 #include "Bullet.h"
 #include "PathBase.h"
 #include "Sound/SoundWave.h"
+#include "Camera/CameraShakeBase.h"
 #include "GameFramework/Character.h"
 #include "MainCharacter.generated.h"
 
@@ -29,11 +30,14 @@ public:
 	UPROPERTY()
 		UGameplayStatics* GameStatic;
 
-	UPROPERTY(EditAnywhere, Category = Sound)
+	UPROPERTY(EditAnywhere, Category = Effect)
 		USoundWave* HitSound; //데미지 사운드
 
-	UPROPERTY(EditAnywhere, Category = Sound)
+	UPROPERTY(EditAnywhere, Category = Effect)
 		USoundWave* ShootSound; //총기 발사 사운드
+
+	UPROPERTY(EditAnywhere, Category = Effect)
+		TSubclassOf<class UCameraShakeBase> DamageCameraShake;
 
 public:
 	// Sets default values for this character's properties

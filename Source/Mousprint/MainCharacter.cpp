@@ -296,6 +296,8 @@ float AMainCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damage
 	GameStatic->PlaySoundAtLocation(GetWorld(), HitSound, this->GetActorLocation()
 									, this->GetActorRotation(), 1.0f);
 
+	GameStatic->GetPlayerController(GetWorld(), 0)->ClientStartCameraShake(DamageCameraShake);
+
 	CharacterCurrHP = FMath::Max(0.0f, CharacterCurrHP-Damage);
 	if (CharacterCurrHP == 0) Die();
 
