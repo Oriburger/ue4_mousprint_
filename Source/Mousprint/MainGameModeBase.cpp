@@ -17,6 +17,7 @@ AMainGameModeBase::AMainGameModeBase()
 	if (LoadGameInstance != nullptr)
 	{
 		bIsTutorialEnd = LoadGameInstance->bIsTutorialEnd;
+		HighScore = LoadGameInstance->HighScore;
 		UE_LOG(LogTemp, Warning, TEXT("Game Load"));
 	}
 	else
@@ -40,6 +41,7 @@ void AMainGameModeBase::Tick(float DeltaTime)
 
 	UpdateStageInfo(DeltaTime);
 	CheckGameOver();
+	MaintainDistance();
 }
 
 void AMainGameModeBase::UpdateStageInfo(const float DeltaTime)
@@ -54,6 +56,15 @@ void AMainGameModeBase::UpdateStageInfo(const float DeltaTime)
 	}
 }
 
+void AMainGameModeBase::MaintainDistance()
+{
+	if (bIsGameOver || !bIsGameStarted) return;
+	if (GetDistanceGasToPlayer() >= 20000.0f)
+		FollowingGas->SetMoveSpeedLimit(10000.0f, 10000.0f); //거리가 20000이상 벌어지면 빠르게 이동
+	else
+		SetStage(Stage); //그렇지 않으면, 속도를 원래대로
+}
+
 void AMainGameModeBase::CheckGameOver()
 {
 	if (!bIsGameStarted || MainCharacter == nullptr) return;
@@ -62,12 +73,14 @@ void AMainGameModeBase::CheckGameOver()
 	{
 		bIsGameOver = true;
 		bIsGameStarted = false;
+
+		SaveGameInfo(true, FMath::Max(HighScore, Score));
 	}
 }
 
 float AMainGameModeBase::SetStage(const int32 stage_)
 {
-	if (StageInfoTable == nullptr) return -1; 
+	if (StageInfoTable == nullptr || bIsGameOver) return -1;
 
 	FStageInfoTableRow* StageInfoRow = StageInfoTable->FindRow<FStageInfoTableRow>
 		(FName(*(FString::FormatAsNumber(stage_))), FString(""));
@@ -88,10 +101,7 @@ bool AMainGameModeBase::GameInit()
 {
 	if (!GetWorld()) return false;
 
-	USaveInfo* SaveGameInstance = Cast<USaveInfo>(UGameplayStatics::CreateSaveGameObject(USaveInfo::StaticClass()));
-	SaveGameInstance->bIsTutorialEnd = true;
-	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex);
-	UE_LOG(LogTemp, Warning, TEXT("Data Saved"));
+	SaveGameInfo(true, HighScore);
 
 	bIsGameStarted = true;
 	FActorSpawnParameters SpawnParams;
@@ -115,8 +125,6 @@ bool AMainGameModeBase::GameStart()
 	if (!GetWorld() || MainCharacter == nullptr || FollowingGas == nullptr) return false;
 
 	MainCharacter->bCanMove = true;
-	
-
 	GetWorld()->GetFirstPlayerController()->SetViewTargetWithBlend(MainCharacter);
 
 	return true;
@@ -134,3 +142,13 @@ bool AMainGameModeBase::GetTutorialIsEnd() const { return bIsTutorialEnd;  }
 void AMainGameModeBase::SetIsTutorialEnd(const bool flag) { bIsTutorialEnd = flag; }
 
 bool AMainGameModeBase::GetGameIsOver() const { return bIsGameOver;  }
+
+bool AMainGameModeBase::SaveGameInfo(bool bIsTutorialEnd_, float score_)
+{
+	USaveInfo* SaveGameInstance = Cast<USaveInfo>(UGameplayStatics::CreateSaveGameObject(USaveInfo::StaticClass()));
+	SaveGameInstance->bIsTutorialEnd = bIsTutorialEnd_;
+	SaveGameInstance->HighScore = FMath::Max(score_, HighScore);
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex);
+	//UE_LOG(LogTemp, Warning, TEXT("Data Saved"));
+	return true;
+}

@@ -16,6 +16,7 @@ class MOUSPRINT_API AMainCharacter : public ACharacter
 	GENERATED_BODY()
 
 private:
+	bool bIsDizzy = false;
 	bool bIsDead = false;
 	bool bIsRagdoll = false;
 	bool bIsAimed = false;
@@ -24,6 +25,7 @@ private:
 	float PathSpawnTime = 0; //PathActor 스폰위한 DeltaTime 계산 값 
 	float DisableRagdollDelay = 0; //Ragdoll 상태에서 다시 풀릴때까지 걸리는 시간
 	float GettingUpTimeDelay = 0; //플레이어가 넘어진 상태에서 다 일어나기까지 걸리는 시간
+	float DizzyTime = 0; //플레이어의 하트가 0이 될 경우, 정신을 차리기까지의 시간
 	float CrouchingTime = 0; //슬라이딩 시간 
 
 public:

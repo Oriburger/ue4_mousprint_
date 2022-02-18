@@ -20,6 +20,9 @@ public:
 		bool bIsTutorialEnd = false;
 
 	UPROPERTY(VisibleAnywhere, Category = Gameplay)
+		float HighScore = 0.0f;
+
+	UPROPERTY(VisibleAnywhere, Category = Gameplay)
 		FString SaveSlotName = "Default";
 
 	UPROPERTY(VisibleAnywhere, Category = Gameplay)

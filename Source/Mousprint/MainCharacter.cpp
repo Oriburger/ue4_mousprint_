@@ -366,6 +366,6 @@ void AMainCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor
 	{
 		SetPlayerRagdoll(true);
 		bIsRagdoll = true;
-		DisableRagdollDelay = 1.5f;
+		DisableRagdollDelay = 0.75f;
 	}
 }
