@@ -111,7 +111,7 @@ void AFollowingGasBase::PlayerBeginOverlap(UPrimitiveComponent* HitComp, AActor*
 
 	UE_LOG(LogTemp, Warning, TEXT("Overlap"));
 
-	UGameplayStatics::ApplyPointDamage(OtherActor, 1000.0f, OtherActor->GetActorLocation(),
+	UGameplayStatics::ApplyPointDamage(OtherActor, 5000.0f, OtherActor->GetActorLocation(),
 		SweepResult, nullptr, this, nullptr);
 	/*
 	UGameplayStatics::ApplyPointDamage(GetWorld(), 1000.0f, DamageCollision->GetComponentLocation(),

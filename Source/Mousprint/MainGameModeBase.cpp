@@ -59,7 +59,7 @@ void AMainGameModeBase::UpdateStageInfo(const float DeltaTime)
 void AMainGameModeBase::MaintainDistance()
 {
 	if (bIsGameOver || !bIsGameStarted) return;
-	if (GetDistanceGasToPlayer() >= 20000.0f)
+	if (GetDistanceGasToPlayer() >= 17500.0f)
 		FollowingGas->SetMoveSpeedLimit(10000.0f, 10000.0f); //거리가 20000이상 벌어지면 빠르게 이동
 	else
 		SetStage(Stage); //그렇지 않으면, 속도를 원래대로
@@ -92,7 +92,7 @@ float AMainGameModeBase::SetStage(const int32 stage_)
 
 	MainCharacter = Cast<AMainCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	MainCharacter->SetWalkSpeedLimit((*StageInfoRow).MinPlayerSpeed, (*StageInfoRow).MaxPlayerSpeed);
-	FollowingGas->SetMoveSpeedLimit((*StageInfoRow).MaxPlayerSpeed * 0.7f, (*StageInfoRow).MaxPlayerSpeed * 0.7f);
+	FollowingGas->SetMoveSpeedLimit((*StageInfoRow).MaxPlayerSpeed * 0.8f, (*StageInfoRow).MaxPlayerSpeed * 0.8f);
 	
 	return (*StageInfoRow).EndTime;
 }

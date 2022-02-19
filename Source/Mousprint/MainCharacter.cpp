@@ -65,6 +65,7 @@ void AMainCharacter::Tick(float DeltaTime)
 	TryStopSlide(DeltaTime); //Slide 중이라면, 일정 시간 이후 자동으로 Slide를 멈춤
 	SpawnPathActor(DeltaTime); //일정 Tick 간격으로 PathActor를 스폰
 
+	UpdateDizzyState(DeltaTime);
 	UpdateRagdollState(DeltaTime);
 	UpdateCharacterSpeed(DeltaTime);
 
@@ -99,6 +100,8 @@ bool AMainCharacter::GetPlayerIsAiming() const { return bIsAimed;  }
 bool AMainCharacter::GetPlayerIsDead() const { return bIsDead;  }
 
 bool AMainCharacter::GetPlayerIsGettingUp() const { return GettingUpTimeDelay > 0; };
+
+bool AMainCharacter::GetPlayerIsDizzy() const { return bIsDizzy; };
 
 void AMainCharacter::MoveForward(float Value)
 {
@@ -198,7 +201,7 @@ void AMainCharacter::StartSlide()
 {
 	if (GetCharacterMovement()->IsCrouching() || bIsDead || bIsRagdoll || !bCanSlide) return;
 
-	StopJump();
+	StopJump(); StopAim();
 	GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterWalkSpeed;
 
 	//UE_LOG(LogTemp, Warning, TEXT("Crouch"));
@@ -233,7 +236,7 @@ void AMainCharacter::StartRush()
 	FTimerHandle WaitHandle;
 	float WaitTime = 0.2f;
 	GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
-		{ LaunchCharacter(GetVelocity() * 1.15f, true, false); }), WaitTime, false); 
+	{ LaunchCharacter(GetVelocity() * 1.15f, true, false); }), WaitTime, false); 
 	
 	GetCharacterMovement()->DefaultLandMovementMode = MOVE_Walking;
 }
@@ -254,13 +257,30 @@ void AMainCharacter::StopJump()
 	LaunchCharacter({ 0.0f, 0.0f, -500.0f }, false, true);
 }
 
+void AMainCharacter::UpdateDizzyState(const float DeltaTime)
+{
+	if (DizzyTime > 0 && bIsDizzy)
+	{
+		DizzyTime = FMath::Max(0.0f, DizzyTime - DeltaTime);
+		CharacterCurrHP = FMath::Min(CharacterMaxHP, CharacterCurrHP + CharacterMaxHP / 500.0f );
+		GetCharacterMovement()->MaxWalkSpeed = CharacterWalkSpeed * 0.25f;
+		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterWalkSpeed * 0.15f;
+		if (DizzyTime == 0)
+		{
+			bIsDizzy = false;
+			CharacterCurrHP = CharacterMaxHP;
+			CharacterWalkSpeed = CharacterMinWalkSpeed + 150.0f;
+		}
+	}
+}
+
 void AMainCharacter::UpdateRagdollState(const float DeltaTime)
 {
 	//Ragdoll 관련 로직
 	if (DisableRagdollDelay > 0) //Ragdoll 상태가 되고, 다시 풀릴때까지의 딜레이
 	{
 		DisableRagdollDelay = FMath::Max(0.0f, DisableRagdollDelay - DeltaTime);
-		if (DisableRagdollDelay == 0) SetPlayerRagdoll(false);
+		if (DisableRagdollDelay == 0 && !bIsDead) SetPlayerRagdoll(false);
 	}
 	else if (GettingUpTimeDelay > 0) //GettingUp AnimMontage이 실행되는 동안, bIsRagdoll 값 갱신을 딜레이
 	{
@@ -275,8 +295,9 @@ void AMainCharacter::UpdateRagdollState(const float DeltaTime)
 
 void AMainCharacter::UpdateCharacterSpeed(const float DeltaTime)
 {
+	if (bIsDizzy || bIsDead) return;
 	CharacterWalkSpeed = FMath::Max(CharacterMinWalkSpeed, CharacterWalkSpeed);
-	CharacterWalkSpeed = FMath::Min(CharacterMaxWalkSpeed, CharacterWalkSpeed + DeltaTime * 15.0f);
+	CharacterWalkSpeed = FMath::Min(CharacterMaxWalkSpeed, CharacterWalkSpeed + DeltaTime * 12.5f);
 
 	if (!GetPlayerIsAiming() && !GetCharacterMovement()->IsCrouching())
 	{
@@ -288,18 +309,27 @@ void AMainCharacter::UpdateCharacterSpeed(const float DeltaTime)
 float AMainCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent
 	, AController* EventInstigator, AActor* DamageCauser)
 {
+	if (bIsInGame && !GetPlayerIsGettingUp() && !bIsDead && !bIsDizzy) PlayAnimMontage(HitAnimMontage, 1.5f);
+
 	float FinalDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
 	//UE_LOG(LogTemp, Warning, TEXT("Take Damage"));
-	if(bIsInGame && !GetPlayerIsGettingUp() && !bIsDead) PlayAnimMontage(HitAnimMontage, 1.5f);
-
 	GameStatic->PlaySoundAtLocation(GetWorld(), HitSound, this->GetActorLocation()
 									, this->GetActorRotation(), 1.0f);
 
 	GameStatic->GetPlayerController(GetWorld(), 0)->ClientStartCameraShake(DamageCameraShake);
 
-	CharacterCurrHP = FMath::Max(0.0f, CharacterCurrHP-Damage);
-	if (CharacterCurrHP == 0) Die();
+	if (Damage >= 1000.0f) Die();
+	else
+	{
+		CharacterCurrHP = FMath::Max(0.0f, CharacterCurrHP - Damage);
+		if (CharacterCurrHP == 0)
+		{
+			bIsDizzy = true;
+			DizzyTime = 4.5f;
+			PlayAnimMontage(DizzyAnimMontage);
+		}
+	}
 
 	return FinalDamage;
 }

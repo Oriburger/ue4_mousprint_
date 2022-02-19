@@ -92,6 +92,9 @@ public:
 		UAnimMontage* FireAnimMontage;
 
 	UPROPERTY(EditAnywhere, Category = AnimMontage)
+		UAnimMontage* DizzyAnimMontage;
+
+	UPROPERTY(EditAnywhere, Category = AnimMontage)
 		UAnimMontage* GettingUpAnimMontage;
 
 	UPROPERTY(EditAnywhere, Category = AnimMontage)
@@ -128,6 +131,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		bool GetPlayerIsGettingUp() const;
 
+	UFUNCTION(BlueprintCallable)
+		bool GetPlayerIsDizzy() const;
+
 	/* --- Axis & Action Input --- */
 	UFUNCTION(BlueprintCallable)
 		void MoveForward(float Value); 
@@ -160,6 +166,9 @@ public:
 		void StopJump();
 
 	/* --- Etc ---- */
+
+	UFUNCTION()
+		void UpdateDizzyState(const float DeltaTime);
 
 	UFUNCTION()
 		void UpdateRagdollState(const float DeltaTime);

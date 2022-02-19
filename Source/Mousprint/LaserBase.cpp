@@ -55,7 +55,7 @@ void ALaserBase::CheckHitAndApplyDamage(FHitResult OutHit)
 	if (DamageDelay != 0.0f) return;
 
 	AActor* HitActor = OutHit.GetActor();
-	UGameplayStatics::ApplyPointDamage(HitActor, 10.0f, HitActor->GetActorLocation(),
+	UGameplayStatics::ApplyPointDamage(HitActor, 25.0f, HitActor->GetActorLocation(),
 									  OutHit, nullptr, this, nullptr);
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, this->GetActorLocation()
 										, this->GetActorRotation(), 1.0f);

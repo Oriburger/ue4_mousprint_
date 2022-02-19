@@ -123,7 +123,7 @@ void AMobBase::UpdateExplosionEffect(const float DeltaTime)
 	if (bIsDead) return;
 	if (ExplodeTime >= 0.15)
 	{
-		UGameplayStatics::ApplyRadialDamage(GetWorld(), 10.0f, GetMesh()->GetComponentLocation()
+		UGameplayStatics::ApplyRadialDamage(GetWorld(), 25.0f, GetMesh()->GetComponentLocation()
 			, 250.0f, UDamageType::StaticClass(), {}, this, nullptr);
 
 		FTransform EmitterTransform;
