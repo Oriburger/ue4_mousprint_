@@ -92,7 +92,7 @@ float AMainGameModeBase::SetStage(const int32 stage_)
 
 	MainCharacter = Cast<AMainCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	MainCharacter->SetWalkSpeedLimit((*StageInfoRow).MinPlayerSpeed, (*StageInfoRow).MaxPlayerSpeed);
-	FollowingGas->SetMoveSpeedLimit((*StageInfoRow).MinPlayerSpeed * 0.9f, (*StageInfoRow).MaxPlayerSpeed * 0.9f);
+	FollowingGas->SetMoveSpeedLimit((*StageInfoRow).MaxPlayerSpeed * 0.7f, (*StageInfoRow).MaxPlayerSpeed * 0.7f);
 	
 	return (*StageInfoRow).EndTime;
 }
@@ -109,7 +109,7 @@ bool AMainGameModeBase::GameInit()
 	SpawnParams.Owner = this; //타일의 소유자는 Generator
 	SpawnParams.Instigator = GetInstigator();
 
-	SpawnTransform.SetLocation({ -7600.0f, 0.0f, 2500.0f });
+	SpawnTransform.SetLocation({ -13600.0f, 0.0f, 2500.0f });
 	TileGenerator = GetWorld()->SpawnActor<ATileGenerator>(TileGeneratorClass, SpawnParams);
 	FollowingGas = GetWorld()->SpawnActor<AFollowingGasBase>(FollowingGasClass, SpawnTransform, SpawnParams);
 	if (TileGenerator == nullptr || FollowingGas == nullptr) return false;

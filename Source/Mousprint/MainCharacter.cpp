@@ -276,7 +276,7 @@ void AMainCharacter::UpdateRagdollState(const float DeltaTime)
 void AMainCharacter::UpdateCharacterSpeed(const float DeltaTime)
 {
 	CharacterWalkSpeed = FMath::Max(CharacterMinWalkSpeed, CharacterWalkSpeed);
-	CharacterWalkSpeed = FMath::Min(CharacterMaxWalkSpeed, CharacterWalkSpeed + DeltaTime * 10.0f);
+	CharacterWalkSpeed = FMath::Min(CharacterMaxWalkSpeed, CharacterWalkSpeed + DeltaTime * 15.0f);
 
 	if (!GetPlayerIsAiming() && !GetCharacterMovement()->IsCrouching())
 	{
@@ -328,7 +328,7 @@ void AMainCharacter::SetPlayerRagdoll(const bool flag)
 	{
 		FAttachmentTransformRules ResetTransform = FAttachmentTransformRules::KeepRelativeTransform; 
 
-		FVector NewLocation = { GetActorLocation().X - 200.0f, 0.0f, 100.0f };
+		FVector NewLocation = { GetActorLocation().X - 500.0f, 0.0f, 100.0f };
 
 		//GetCapsuleComponent()->SetWorldLocation(GetMesh()->GetComponentLocation() + FVector(-50.0f, 0.0f, 100.0f), false, nullptr, ETeleportType::TeleportPhysics);
 		GetCapsuleComponent()->SetWorldLocation(NewLocation, false, nullptr, ETeleportType::TeleportPhysics);

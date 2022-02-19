@@ -73,7 +73,7 @@ void AFollowingGasBase::CheckPathAndUpdateLocation()
 void AFollowingGasBase::UpdateCharacterSpeed(const float DeltaTime)
 {
 	if (!bCanMove) return;
-	CharacterMoveSpeed = FMath::Min(CharacterMaxMoveSpeed, CharacterMoveSpeed + DeltaTime * 7.5f);
+	//CharacterMoveSpeed = FMath::Min(CharacterMaxMoveSpeed, CharacterMoveSpeed + DeltaTime * 7.5f);
 	GetCharacterMovement()->MaxFlySpeed = CharacterMoveSpeed;
 }
 
