@@ -18,6 +18,7 @@ class MOUSPRINT_API AMainGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 private:
 	bool bIsGameStarted = false;
+	bool bIsGameInitialized = false; 
 	bool bIsGameOver = false;
 	bool bIsTutorialEnd = false; 
 	float DeltaTimeSum = 0;
@@ -82,6 +83,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		bool GetIsGameStarted() const;
+
+	UFUNCTION(BlueprintCallable)
+		bool GetIsGameInitialized() const;
 
 	UFUNCTION(BlueprintCallable)
 		void SetIsTutorialEnd(const bool flag);

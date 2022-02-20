@@ -17,11 +17,6 @@ void ATileGenerator::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (BeginTileClassArray.IsValidIndex(Stage))
-	{
-		ATileBasic* InitialTile = SpawnTile(BeginTileClassArray[Stage]);
-		if (InitialTile) SpawnedTileArr.Push(InitialTile); //게임 시작 시 하나는 스폰
-	}
 }
 
 // Called every frame

@@ -102,13 +102,14 @@ bool AMainGameModeBase::GameInit()
 	if (!GetWorld()) return false;
 
 	SaveGameInfo(true, HighScore);
+	bIsGameInitialized = true;
 
 	FActorSpawnParameters SpawnParams;
 	FTransform SpawnTransform;
 	SpawnParams.Owner = this; //타일의 소유자는 Generator
 	SpawnParams.Instigator = GetInstigator();
 
-	SpawnTransform.SetLocation({ -13600.0f, 0.0f, 2500.0f });
+	SpawnTransform.SetLocation({ -13600.0f, 0.0f, 2000.0f });
 	TileGenerator = GetWorld()->SpawnActor<ATileGenerator>(TileGeneratorClass, SpawnParams);
 	FollowingGas = GetWorld()->SpawnActor<AFollowingGasBase>(FollowingGasClass, SpawnTransform, SpawnParams);
 	if (TileGenerator == nullptr || FollowingGas == nullptr) return false;
@@ -140,6 +141,8 @@ float AMainGameModeBase::GetDistanceGasToPlayer() const
 bool AMainGameModeBase::GetTutorialIsEnd() const { return bIsTutorialEnd;  }
 
 bool AMainGameModeBase::GetIsGameStarted() const { return bIsGameStarted; }
+
+bool AMainGameModeBase::GetIsGameInitialized() const { return bIsGameInitialized; }
 
 void AMainGameModeBase::SetIsTutorialEnd(const bool flag) { bIsTutorialEnd = flag; }
 
