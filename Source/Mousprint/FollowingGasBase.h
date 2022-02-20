@@ -15,6 +15,7 @@ class MOUSPRINT_API AFollowingGasBase : public ACharacter
 private:
 	TArray<AActor*> PathList;
 	bool bCanMove = false; 
+	bool bChaingMode = false;
 
 public:
 	// Sets default values for this character's properties
@@ -69,5 +70,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void SetGasCanMove(const bool flag);
-	
+
+	UFUNCTION()
+		void SetChaingMode(const bool flag);
 };

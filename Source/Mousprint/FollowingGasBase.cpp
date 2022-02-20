@@ -74,7 +74,7 @@ void AFollowingGasBase::UpdateCharacterSpeed(const float DeltaTime)
 {
 	if (!bCanMove) return;
 	//CharacterMoveSpeed = FMath::Min(CharacterMaxMoveSpeed, CharacterMoveSpeed + DeltaTime * 7.5f);
-	GetCharacterMovement()->MaxFlySpeed = CharacterMoveSpeed;
+	GetCharacterMovement()->MaxFlySpeed = bChaingMode ? 20000 : CharacterMoveSpeed;
 }
 
 void AFollowingGasBase::SetMoveSpeedLimit(const float MinValue, const float MaxValue)
@@ -119,3 +119,5 @@ void AFollowingGasBase::PlayerBeginOverlap(UPrimitiveComponent* HitComp, AActor*
 }
 
 void AFollowingGasBase::SetGasCanMove(const bool flag) { bCanMove = flag; }
+
+void AFollowingGasBase::SetChaingMode(const bool flag) { bChaingMode = flag; }

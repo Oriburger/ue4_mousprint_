@@ -3,6 +3,7 @@
 
 #include "MainCharacter.h"
 #include "MobBase.h"
+#include "MainGameModeBase.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -262,7 +263,7 @@ void AMainCharacter::UpdateDizzyState(const float DeltaTime)
 	if (DizzyTime > 0 && bIsDizzy)
 	{
 		DizzyTime = FMath::Max(0.0f, DizzyTime - DeltaTime);
-		CharacterCurrHP = FMath::Min(CharacterMaxHP, CharacterCurrHP + CharacterMaxHP / 500.0f );
+		CharacterCurrHP = FMath::Min(CharacterMaxHP, CharacterCurrHP + CharacterMaxHP / 550.0f );
 		GetCharacterMovement()->MaxWalkSpeed = CharacterWalkSpeed * 0.25f;
 		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterWalkSpeed * 0.15f;
 		if (DizzyTime == 0)
@@ -297,7 +298,7 @@ void AMainCharacter::UpdateCharacterSpeed(const float DeltaTime)
 {
 	if (bIsDizzy || bIsDead) return;
 	CharacterWalkSpeed = FMath::Max(CharacterMinWalkSpeed, CharacterWalkSpeed);
-	CharacterWalkSpeed = FMath::Min(CharacterMaxWalkSpeed, CharacterWalkSpeed + DeltaTime * 12.5f);
+	CharacterWalkSpeed = FMath::Min(CharacterMaxWalkSpeed, CharacterWalkSpeed + DeltaTime * 15.0f);
 
 	if (!GetPlayerIsAiming() && !GetCharacterMovement()->IsCrouching())
 	{
@@ -357,8 +358,7 @@ void AMainCharacter::SetPlayerRagdoll(const bool flag)
 	else //Mesh 위치를 초기화 시키며 일어나는 애니메이션을 출력
 	{
 		FAttachmentTransformRules ResetTransform = FAttachmentTransformRules::KeepRelativeTransform; 
-
-		FVector NewLocation = { GetActorLocation().X - 500.0f, 0.0f, 100.0f };
+		FVector NewLocation = { GetActorLocation().X + 400.0f, 0.0f, 100.0f };
 
 		//GetCapsuleComponent()->SetWorldLocation(GetMesh()->GetComponentLocation() + FVector(-50.0f, 0.0f, 100.0f), false, nullptr, ETeleportType::TeleportPhysics);
 		GetCapsuleComponent()->SetWorldLocation(NewLocation, false, nullptr, ETeleportType::TeleportPhysics);

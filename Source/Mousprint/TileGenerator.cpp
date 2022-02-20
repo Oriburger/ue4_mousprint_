@@ -46,11 +46,11 @@ void ATileGenerator::SpawnNextTile()
 
 		//UE_LOG(LogTemp, Warning, TEXT("TileGenerator : next tile idx is %d"), nextTileIdx);
 
-		if (TileClassArray.IsValidIndex(nextTileIdx))
+		if (TileClassArray.IsValidIndex(nextTileIdx) && BeginTileClassArray.IsValidIndex(Stage))
 		{
-			SpawnedTile = SpawnTile(TileClassArray[nextTileIdx]);
+			SpawnedTile = SpawnTile((bIsStageChanged ? BeginTileClassArray[Stage]: TileClassArray[nextTileIdx]));
+			if (bIsStageChanged) bIsStageChanged = false; 
 			if (SpawnedTile != nullptr)	SpawnedTileArr.Push(SpawnedTile);//Spawn 된 타일을 Arr에 넣음
-
 		//	UE_LOG(LogTemp, Warning, TEXT("TileGenerator : %d Tile Pushed"), nextTileIdx);
 		}
 	}
@@ -79,7 +79,7 @@ FTransform ATileGenerator::GetNextSpawnTransform() const
 }
 
 int32 ATileGenerator::GetNextSpawnTileIdx() 
-{
+{   
 	int32 nextTileIdx = -1;
 
 	/*--- 다음 스폰할 타일의 Idx와 유형을 무작위로 선택 ---*/
@@ -137,15 +137,18 @@ ATileBasic* ATileGenerator::SpawnTile(TSubclassOf<class ATileBasic>& SpawnTarget
 	return NewTile;
 }
 
-bool ATileGenerator::SetSpawnTileIdxRange(const int32 start_straight, const int32 finish_straight
+bool ATileGenerator::SetSpawnTileIdxRange(const int32 stage_, const int32 start_straight, const int32 finish_straight
 										, const int32 start_curve, const int32 finish_curve)
 {
 	if (start_straight > finish_straight || start_curve > finish_curve) return false;
+
+	Stage = stage_;
 
 	StraightTileMinIdx = start_straight;
 	StraightTileMaxIdx = finish_straight;
 	CurveTileMinIdx = start_curve;
 	CurveTileMaxIdx = finish_curve;
+	bIsStageChanged = true;
 
 	return true;
 }

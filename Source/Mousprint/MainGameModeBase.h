@@ -81,10 +81,19 @@ public:
 		bool GetTutorialIsEnd() const; //튜토리얼이 끝났는지 여부를 반환
 
 	UFUNCTION(BlueprintCallable)
+		bool GetIsGameStarted() const;
+
+	UFUNCTION(BlueprintCallable)
 		void SetIsTutorialEnd(const bool flag);
 
 	UFUNCTION(BlueprintCallable)
+		void ForceGameEnd();
+
+	UFUNCTION(BlueprintCallable)
 		bool GetGameIsOver() const;
+
+	UFUNCTION()
+		int32 GetCurrentStage() const;
 
 	UFUNCTION()
 		bool SaveGameInfo(bool bIsTutorialEnd_, float score_);

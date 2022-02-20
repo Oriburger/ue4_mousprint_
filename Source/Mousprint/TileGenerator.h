@@ -21,6 +21,7 @@ private:
 	int32 CurveTileMinIdx = 0; //스폰할 타일 액터의 시작 Idx
 	int32 CurveTileMaxIdx = 0; //스폰할 타일 액터의 끝 Idx
 
+	bool bIsStageChanged = false;
 	bool prevCurveTileType = 0; //0 왼쪽 1 오른쪽
 	bool prevTileType; //이전에 스폰된 타일 유형 - 0 직선, 1 커브
 	int32 prevTileIdx = -1; //이전에 스폰된 타일의 Idx
@@ -69,7 +70,7 @@ public:
 																 //_bIsInit : 최초 스폰 시 true로 전달 
 																 //TileIdx : 스폰할 타일 클래스의 idx를 전달
 	UFUNCTION(BlueprintCallable)
-		bool SetSpawnTileIdxRange(const int32 start_straight, const int32 finish_straight
+		bool SetSpawnTileIdxRange(const int32 stage_, const int32 start_straight, const int32 finish_straight
 								, const int32 start_curve, const int32 finish_curve);
 
 	UFUNCTION()
