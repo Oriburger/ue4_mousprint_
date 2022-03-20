@@ -31,6 +31,16 @@ void AMainGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (LoadGameInstance != nullptr)
+	{
+		bIsTutorialEnd = LoadGameInstance->bIsTutorialEnd;
+		HighScore = LoadGameInstance->HighScore;
+		UE_LOG(LogTemp, Warning, TEXT("Game Load"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Save Data Not Found"));
+	}
 }
 
 // Called every frame
