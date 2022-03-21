@@ -2,6 +2,7 @@
 
 
 #include "ObstacleBase.h"
+#include "TimerManager.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -36,7 +37,8 @@ AObstacleBase::AObstacleBase()
 void AObstacleBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	GetWorldTimerManager().SetTimer(ObstacleTimerHandle, this, &AObstacleBase::UpdateObstacleLocation, 0.01f, true, 0.0f);
 }
 
 // Called every frame
@@ -44,7 +46,7 @@ void AObstacleBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UpdateObstacleLocation();
+	//UpdateObstacleLocation();
 }
 
 void AObstacleBase::UpdateObstacleLocation()
@@ -52,7 +54,7 @@ void AObstacleBase::UpdateObstacleLocation()
 	for (int idx = 0; idx < UseObstacleCount; idx++)
 	{
 		if (!bIsMovingObstacle.IsValidIndex(idx) || !bIsMovingObstacle[idx]) continue;
-		//UE_LOG(LogTemp, Warning, TEXT("ObstacleBase : UpdateObstacle ID#%d to %d"), idx, bIsArrived[idx] ? idx * 2 + 1 : idx * 2);
+		UE_LOG(LogTemp, Warning, TEXT("ObstacleBase : UpdateObstacle ID#%d to %d"), idx, bIsArrived[idx] ? idx * 2 + 1 : idx * 2);
 		MoveObstacle(idx, bIsArrived[idx] ? idx * 2 + 1 : idx * 2);
 	}
 }
