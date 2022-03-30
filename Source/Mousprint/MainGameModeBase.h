@@ -23,6 +23,7 @@ private:
 	bool bIsTutorialEnd = false; 
 	float DeltaTimeSum = 0;
 	float StageEndTime = 0;
+	const float MaxDistance = 17500.0f;
 
 	ATileGenerator* TileGenerator;
 	AMainCharacter* MainCharacter;
@@ -80,6 +81,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		bool GetTutorialIsEnd() const; //튜토리얼이 끝났는지 여부를 반환
+
+	UFUNCTION()
+		float GetMaxDistance() const; 
 
 	UFUNCTION(BlueprintCallable)
 		bool GetIsGameStarted() const;

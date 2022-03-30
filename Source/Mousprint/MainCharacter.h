@@ -41,6 +41,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = Effect)
 		TSubclassOf<class UCameraShakeBase> DamageCameraShake;
 
+	UPROPERTY(EditAnywhere, Category = Effect)
+		TSubclassOf<class UCameraShakeBase> GasCameraShake;
+
 public:
 	// Sets default values for this character's properties
 	AMainCharacter();
@@ -175,6 +178,9 @@ public:
 
 	UFUNCTION()
 		void UpdateCharacterSpeed(const float DeltaTime);
+
+	UFUNCTION()
+		void UpdateGasCamShakeEffect() const;
 
 	UFUNCTION()
 		virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent

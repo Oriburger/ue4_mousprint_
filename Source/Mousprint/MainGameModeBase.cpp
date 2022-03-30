@@ -30,17 +30,6 @@ AMainGameModeBase::AMainGameModeBase()
 void AMainGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (LoadGameInstance != nullptr)
-	{
-		bIsTutorialEnd = LoadGameInstance->bIsTutorialEnd;
-		HighScore = LoadGameInstance->HighScore;
-		UE_LOG(LogTemp, Warning, TEXT("Game Load"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Save Data Not Found"));
-	}
 }
 
 // Called every frame
@@ -65,12 +54,12 @@ void AMainGameModeBase::UpdateStageInfo(const float DeltaTime)
 	}
 }
 
-void AMainGameModeBase::MaintainDistance()
+void AMainGameModeBase::MaintainDistance() //플레이어와 가스는 거리를 유지
 {
 	if (bIsGameOver || !bIsGameStarted) return;
-	if (GetDistanceGasToPlayer() >= 17500.0f)
+	if (GetDistanceGasToPlayer() >= MaxDistance) //MaxDistance 만큼 멀어지면 Gas는 ChasingMode에 돌입 (속도 대폭 증가)
 		FollowingGas->SetChaingMode(true);
-	else   
+	else										//그게 아니라면 일반 모드로 전환
 		FollowingGas->SetChaingMode(false);
 }
 
@@ -149,6 +138,8 @@ float AMainGameModeBase::GetDistanceGasToPlayer() const
 }
 
 bool AMainGameModeBase::GetTutorialIsEnd() const { return bIsTutorialEnd;  }
+
+float AMainGameModeBase::GetMaxDistance() const { return MaxDistance; }
 
 bool AMainGameModeBase::GetIsGameStarted() const { return bIsGameStarted; }
 

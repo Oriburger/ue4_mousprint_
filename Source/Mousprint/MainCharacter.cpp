@@ -6,6 +6,8 @@
 #include "MainGameModeBase.h"
 #include "Kismet/KismetMathLibrary.h"
 
+static AMainGameModeBase* GameModeRef = nullptr;
+
 // Sets default values
 AMainCharacter::AMainCharacter()
 {
@@ -53,6 +55,7 @@ void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GameModeRef = Cast<AMainGameModeBase>(GameStatic->GetGameMode(GetWorld()));
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AMainCharacter::OnHit); //Hit 이벤트 추가
 }
 
@@ -65,7 +68,7 @@ void AMainCharacter::Tick(float DeltaTime)
 
 	TryStopSlide(DeltaTime); //Slide 중이라면, 일정 시간 이후 자동으로 Slide를 멈춤
 	SpawnPathActor(DeltaTime); //일정 Tick 간격으로 PathActor를 스폰
-
+	UpdateGasCamShakeEffect();
 	UpdateDizzyState(DeltaTime);
 	UpdateRagdollState(DeltaTime);
 	UpdateCharacterSpeed(DeltaTime);
@@ -305,6 +308,17 @@ void AMainCharacter::UpdateCharacterSpeed(const float DeltaTime)
 		GetCharacterMovement()->MaxWalkSpeed = CharacterWalkSpeed;
 		GetCharacterMovement()->MaxWalkSpeedCrouched = CharacterWalkSpeed * 0.75;
 	}
+}
+
+void AMainCharacter::UpdateGasCamShakeEffect() const
+{
+	if (!GameModeRef->GetIsGameStarted() || !GameModeRef->GetIsGameInitialized()) return;
+
+	const float DistToGasRatio = 1.0f - FMath::Max(0.0f, GameModeRef->GetDistanceGasToPlayer()) / GameModeRef->GetMaxDistance();
+
+	if (DistToGasRatio <= 0.6f) return;
+	
+	GameStatic->GetPlayerController(GetWorld(), 0)->ClientStartCameraShake(GasCameraShake, DistToGasRatio / 150.0f);
 }
 
 float AMainCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent
