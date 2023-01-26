@@ -6,7 +6,7 @@
 
 > [📜 Notion Page](https://oriburger.notion.site/Mousprint-94fa53a30a514273af9dec54c3910555)
 > [✏️ Game Guide](https://oriburger.notion.site/e2a146b8aa7b435dbbd92f34ce211669)
-> [🕹️ Download!](https://drive.google.com/file/d/1trtmr3xGs6tpEMx5tIzlowv8CiNBp5xU/view?usp=sharing)
+> [🕹️ Download!](https://drive.google.com/file/d/1PgrvwY0CcGWtjSrfGcO7P-8A9-370sHB/view?usp=share_link)
 
 <br>
 
